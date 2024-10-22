@@ -1,0 +1,32 @@
+//
+//  Develop.xcconfig
+//  LiveTV
+//
+//  Created by 10-N3344 on 2023/06/15.
+//
+
+// Configuration settings file format documentation can be found at:
+// https://help.apple.com/xcode/#/dev745c5c974
+
+// App Name
+INFOPLIST_KEY_CFBundleDisplayName = LiveTV
+
+//Bundle ID
+// PRODUCT_BUNDLE_IDENTIFIER = io.appstudio.LiveTV.dev
+PRODUCT_BUNDLE_IDENTIFIER = io.appstudio.LiveTV
+
+//Base URL
+BASE_URL = http:\/\/webtv.dothome.co.kr
+
+// Firebase config file
+ FIREBASE_SERVICE_FILE_NAME = GoogleService-Info
+
+SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEVELOP DEBUG
+
+APPSTORE_ID = 6473762430
+
+APP_GROUP_IDENTIFIER = group.io.appstudio.LiveTV.dev
+
+MARKETING_VERSION = 1.0.0
+
+CURRENT_PROJECT_VERSION = 1
