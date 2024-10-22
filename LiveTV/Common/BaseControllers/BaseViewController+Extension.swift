@@ -92,7 +92,7 @@ extension BaseViewController {
 
     func setAudioSessionActive(_ isActive: Bool, category: AVAudioSession.Category = .playback) {
         DispatchQueue.main.async {
-            try? AVAudioSession.sharedInstance().setCategory(category, mode: .moviePlayback, options: [.allowBluetooth, .defaultToSpeaker, .allowAirPlay, .allowBluetoothA2DP])
+            try? AVAudioSession.sharedInstance().setCategory(category, mode: .moviePlayback, options: [.allowBluetooth, .allowAirPlay, .allowBluetoothA2DP])
             if category == .playAndRecord || category == .record {
                 try? AVAudioSession.sharedInstance().setActive(isActive, options: .notifyOthersOnDeactivation)
             } else {
