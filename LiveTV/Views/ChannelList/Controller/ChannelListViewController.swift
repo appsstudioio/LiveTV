@@ -448,18 +448,9 @@ extension ChannelListViewController: WKUIDelegate {
         DLog("#### \(#function) :: \(String(describing: navigationAction.request.httpBody))")
         if (navigationAction.targetFrame == nil) {
             if let url = navigationAction.request.url {
-                ProgressHUD.animate("", interaction: false)
-                viewModel.getFinalURL(for: url) { [weak self] finalURL, error in
-                    self?.endRefreshTableReload()
-                    if let error = error {
-                        DLog("오류 발생: \(error.localizedDescription)")
-                        ToastView.show(.error, message: "오류 발생: \(error.localizedDescription)")
-                    } else if let finalURL = finalURL {
-                        DLog("최종 URL: \(finalURL)")
-                        DispatchQueue.main.async {
-                            self?.createVideoWebView(urlString: url.absoluteString)
-                        }
-                    }
+                // ProgressHUD.animate("", interaction: false)
+                DispatchQueue.main.async {
+                    self.createVideoWebView(urlString: url.absoluteString)
                 }
             }
         }

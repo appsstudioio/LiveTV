@@ -10,9 +10,12 @@ import Firebase
 import FirebaseCore
 import FirebaseAnalytics
 import FirebaseCrashlytics
+import GoogleCast
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
+
+    let kReceiverAppID = kGCKDefaultMediaReceiverApplicationID
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
@@ -39,6 +42,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         CommonFunctions.kingfisherConfig()
         CommonFunctions.progressHUDConfig()
+
+        let discoveryCriteria = GCKDiscoveryCriteria(applicationID: kReceiverAppID)
+        let options = GCKCastOptions(discoveryCriteria: discoveryCriteria)
+        GCKCastContext.setSharedInstanceWith(options)
+
         // disable autolayout logging
         UserDefaults.standard.set(false, forKey: "_UIConstraintBasedLayoutLogUnsatisfiable")
 

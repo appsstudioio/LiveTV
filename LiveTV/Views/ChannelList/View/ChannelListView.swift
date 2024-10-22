@@ -72,6 +72,17 @@ final class ChannelListView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
 
+    override func layoutSubviews() {
+        super.layoutSubviews()
+
+        if let textField = searchBarView.value(forKey: "searchField") as? UITextField {
+            textField.layer.borderWidth = 1
+            textField.layer.cornerRadius = 8
+            textField.layer.borderColor = UIColor.named(.borderOpaque).cgColor
+            textField.attributedPlaceholder = "채널명을 입력하세요.".toAttributed(fontType: .r17px, lineHeight: 0, color: UIColor.named(.contentPlaceHolder))
+        }
+    }
+
     // MARK: - functions
     private func setupUI() {
         backgroundColor = UIColor.named(.backgroundColor)
@@ -110,11 +121,7 @@ final class ChannelListView: UIView {
 
         if let textField = searchBarView.value(forKey: "searchField") as? UITextField {
             textField.backgroundColor = UIColor.named(.backgroundColor)
-            textField.attributedPlaceholder = "채널명을 입력하세요.".toAttributed(fontType: .r17px, lineHeight: 0, color: UIColor.named(.contentPlaceHolder))
             textField.textColor = UIColor.named(.contentPrimary)
-            textField.layer.borderWidth = 1
-            textField.layer.cornerRadius = 8
-            textField.layer.borderColor = UIColor.named(.borderOpaque).cgColor
             textField.textContentType = .none
             //왼쪽 아이콘 이미지넣기
             if let leftView = textField.leftView as? UIImageView {

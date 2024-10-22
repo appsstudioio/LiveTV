@@ -11,16 +11,22 @@ import Then
 import Combine
 import AVFoundation
 import AVKit
+import GoogleCast
+
 
 final class VideoPlayerViewController: BaseViewController {
 
-    let backButton = UIButton(type: .custom).then {
+    let backButton = UIButton().then {
         $0.setImage(UIImage(systemName: "arrow.backward"), for: .normal)
         $0.tintColor = .named(.contentPrimary)
     }
 
-    let infoButton = UIButton(type: .custom).then {
+    let infoButton = UIButton().then {
         $0.setImage(UIImage(systemName: "list.and.film"), for: .normal)
+        $0.tintColor = .named(.contentPrimary)
+    }
+
+    let castButton = GCKUICastButton().then {
         $0.tintColor = .named(.contentPrimary)
     }
 
@@ -59,7 +65,6 @@ final class VideoPlayerViewController: BaseViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-
     }
 
     override func viewWillDisappear(_ animated: Bool) {
@@ -68,7 +73,7 @@ final class VideoPlayerViewController: BaseViewController {
 
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
-        player.pause()
+        videoPause()
         setAudioSessionActive(false)
     }
 
@@ -96,7 +101,7 @@ final class VideoPlayerViewController: BaseViewController {
             if self.player.timeControlStatus == .playing {
                 self.alertConfirmWith(message: "티비 재생을 종료하시겠습니까?") { isOkay in
                     if isOkay {
-                        self.player.pause()
+                        self.videoPause()
                         self.moveBack()
                     }
                 }
@@ -109,12 +114,22 @@ final class VideoPlayerViewController: BaseViewController {
             guard let self = self else { return }
             self.showSafariView(urlString: self.viewModel.getTimeTableUrlLink())
         }.store(in: &cancellables)
+
+        castButton.tapPublisher.sink { [weak self] in
+            guard let self = self else { return }
+            self.castMedia(url: self.viewModel.videoUrl, title: self.viewModel.titleName)
+        }.store(in: &cancellables)
+
+        videoPlay()
     }
 
     private func setupUI() {
         setNavigationBarTitle(viewModel.titleName)
         hideNavigationLeftButton(hidden: false, button: backButton, buttonSize: CGSize(width: 24, height: 24))
-        hideNavigationRightButton(hidden: false, button: infoButton, buttonSize: CGSize(width: 24, height: 24))
+
+        let infoItem = UIBarButtonItem.buttonToBarButtonItem(infoButton)
+        let castItem = UIBarButtonItem.buttonToBarButtonItem(castButton)
+        navigationItem.rightBarButtonItems = [infoItem, castItem]
 
         guard let url = URL(string: viewModel.videoUrl) else {
             self.alertWith(message: "재생 가능한 동영상을 찾을 수 없습니다!") { _ in
@@ -155,5 +170,40 @@ final class VideoPlayerViewController: BaseViewController {
 
 // MARK: - extensions
 extension VideoPlayerViewController {
+    private func videoPlay() {
+        player.play()
+    }
 
+    private func videoPause() {
+        player.pause()
+    }
+}
+
+extension VideoPlayerViewController: GCKSessionManagerListener {
+    func castMedia(url: String, title: String) {
+        let mediaMetadata = GCKMediaMetadata(metadataType: .movie)
+        mediaMetadata.setString(title, forKey: kGCKMetadataKeyTitle)
+
+        let mediaInfo = GCKMediaInformation(
+            contentID: url,
+            streamType: .buffered,
+            contentType: "video/mp4",
+            metadata: mediaMetadata,
+            streamDuration: 0,
+            mediaTracks: nil,
+            textTrackStyle: nil,
+            customData: nil
+        )
+
+        let castSession = GCKCastContext.sharedInstance().sessionManager.currentCastSession
+        castSession?.remoteMediaClient?.loadMedia(mediaInfo, autoplay: true)
+    }
+
+    func sessionManager(_ sessionManager: GCKSessionManager, didStart session: GCKSession) {
+        DLog("Cast session started")
+    }
+
+    func sessionManager(_ sessionManager: GCKSessionManager, didEnd session: GCKSession, withError error: Error?) {
+        DLog("Cast session ended")
+    }
 }

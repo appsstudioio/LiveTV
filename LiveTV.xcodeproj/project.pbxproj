@@ -21,6 +21,19 @@
 		3E74DA162CC6161D0069580B /* FirebasePerformance in Frameworks */ = {isa = PBXBuildFile; productRef = 3E74DA152CC6161D0069580B /* FirebasePerformance */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		3E74C6252CC7889B00934EF2 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		3E6B2AF52CC0E7DA00EED566 /* LiveTV.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LiveTV.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -35,11 +48,25 @@
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
+/* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
+		3E74C6262CC7889B00934EF2 /* Exceptions for "LiveTV" folder in "Embed Frameworks" phase from "LiveTV" target */ = {
+			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
+			attributesByRelativePath = {
+				"Resources/GoogleCastSDK-ios-4.8.3_dynamic_xcframework/GoogleCast.xcframework" = (CodeSignOnCopy, RemoveHeadersOnCopy, );
+			};
+			buildPhase = 3E74C6252CC7889B00934EF2 /* Embed Frameworks */;
+			membershipExceptions = (
+				"Resources/GoogleCastSDK-ios-4.8.3_dynamic_xcframework/GoogleCast.xcframework",
+			);
+		};
+/* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		3E6B2AF72CC0E7DA00EED566 /* LiveTV */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				3E6B2B072CC0E7DC00EED566 /* Exceptions for "LiveTV" folder in "LiveTV" target */,
+				3E74C6262CC7889B00934EF2 /* Exceptions for "LiveTV" folder in "Embed Frameworks" phase from "LiveTV" target */,
 			);
 			path = LiveTV;
 			sourceTree = "<group>";
@@ -95,6 +122,7 @@
 				3E6B2AF12CC0E7DA00EED566 /* Sources */,
 				3E6B2AF22CC0E7DA00EED566 /* Frameworks */,
 				3E6B2AF32CC0E7DA00EED566 /* Resources */,
+				3E74C6252CC7889B00934EF2 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -202,8 +230,9 @@
 				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = LiveTV/Resources/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "$(INFOPLIST_KEY_CFBundleDisplayName)";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.entertainment";
-				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "에어플레이를 사용하기 위해서는 로컬 네트워크 접근이 필요합니다. ";
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "로컬 네트워크를 사용하여 WiFi 네트워크에서 Cast 지원 기기를 검색합니다.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -237,8 +266,9 @@
 				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = LiveTV/Resources/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "$(INFOPLIST_KEY_CFBundleDisplayName)";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.entertainment";
-				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "에어플레이를 사용하기 위해서는 로컬 네트워크 접근이 필요합니다. ";
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "로컬 네트워크를 사용하여 WiFi 네트워크에서 Cast 지원 기기를 검색합니다.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";

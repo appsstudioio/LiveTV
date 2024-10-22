@@ -133,8 +133,11 @@ extension ChannelListViewModel {
     
     func getFinalURL(for initialURL: URL, completion: @escaping (URL?, Error?) -> Void) {
         let session = URLSession(configuration: .default)
+        session.configuration.timeoutIntervalForRequest = 10
+        session.configuration.timeoutIntervalForResource = 10
         var request = URLRequest(url: initialURL)
         request.httpMethod = "HEAD"  // HEAD 메소드를 사용하여 헤더만 가져옵니다
+        request.timeoutInterval = 10
 
         let task = session.dataTask(with: request) { _, response, error in
             if let error = error {
