@@ -22,5 +22,8 @@ final class VideoPlayerViewModel {
 }
 
 extension VideoPlayerViewModel {
-
+    func getTimeTableUrlLink() -> String {
+        let query = "\(titleName) 편성표".addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        return "https://m.search.naver.com/search.naver?query=\(query)"
+    }
 }

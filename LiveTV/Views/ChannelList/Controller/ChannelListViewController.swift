@@ -64,7 +64,6 @@ final class ChannelListViewController: BaseViewController {
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         // Trait collection has already changed
         if #available(iOS 12.0, *) {
-            let userInterfaceStyle = self.traitCollection.userInterfaceStyle
             self.viewModel.state.updateUI.send()
         }
     }
@@ -296,6 +295,10 @@ extension ChannelListViewController: UICollectionViewDelegate {
             guard viewModel.searchLists.count > indexPath.item else { return }
             selectChannel = viewModel.searchLists[indexPath.item]
             script = viewModel.searchLists[indexPath.item].link
+            // 리스트 모드로 변경..
+            subViews.searchBarView.text = ""
+            closeKeyboard()
+            searchMode(viewMode: .list)
         } else {
             guard viewModel.listData.count > indexPath.item else { return }
             selectChannel = viewModel.listData[indexPath.item]
@@ -390,15 +393,6 @@ extension ChannelListViewController: WKNavigationDelegate {
             decisionHandler(.cancel)
             return
         }
-
-//        let navigationType = navigationAction.navigationType
-//        if navigationType == .other && webView == videoWebView {
-//            // 사용자 상호작용이 아닌 경우, 메타 리프레시로 추정
-//            DLog("메타 리프레시 또는 스크립트에 의한 네비게이션 발생")
-//            // 필요 시 네비게이션을 차단하거나 추가 처리
-//            decisionHandler(.cancel)
-//            return
-//        }
 
         let scheme = url.scheme ?? ""
         DLog("### \(scheme)")

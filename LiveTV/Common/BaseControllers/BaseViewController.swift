@@ -14,7 +14,7 @@ import AVFoundation
 import PhotosUI
 import MessageUI
 
-public class BaseViewController: UIViewController, UIGestureRecognizerDelegate {
+public class BaseViewController: UIViewController {
 
     var cancellables: Set<AnyCancellable> = []
 

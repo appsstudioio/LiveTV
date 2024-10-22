@@ -14,10 +14,6 @@ class ChannelListCell: UICollectionViewCell {
 
     let contentBoxView = UIView().then {
         $0.backgroundColor = UIColor.named(.backgroundColor)
-        $0.layer.cornerRadius = 8
-        $0.layer.borderWidth = 1
-        $0.layer.borderColor = UIColor.named(.borderOpaque).cgColor
-        $0.layer.makeShadow(y: 2, blur: 5)
     }
 
     var titleLabel = UILabel().then {
@@ -56,6 +52,15 @@ class ChannelListCell: UICollectionViewCell {
             $0.top.bottom.equalToSuperview().inset(12)
             $0.leading.trailing.equalToSuperview().inset(12)
         }
+    }
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+
+        contentBoxView.layer.cornerRadius = 8
+        contentBoxView.layer.borderWidth = 1
+        contentBoxView.layer.borderColor = UIColor.named(.borderOpaque).cgColor
+        contentBoxView.layer.makeShadow(y: 2, blur: 4)
     }
 }
 
