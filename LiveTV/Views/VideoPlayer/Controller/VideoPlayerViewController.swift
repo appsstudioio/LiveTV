@@ -179,24 +179,25 @@ extension VideoPlayerViewController {
     }
 }
 
-extension VideoPlayerViewController: GCKSessionManagerListener {
+extension VideoPlayerViewController: GCKRequestDelegate {
     func castMedia(url: String, title: String) {
         let mediaMetadata = GCKMediaMetadata(metadataType: .movie)
         mediaMetadata.setString(title, forKey: kGCKMetadataKeyTitle)
 
-        let mediaInfo = GCKMediaInformation(
-            contentID: url,
-            streamType: .buffered,
-            contentType: "video/mp4",
-            metadata: mediaMetadata,
-            streamDuration: 0,
-            mediaTracks: nil,
-            textTrackStyle: nil,
-            customData: nil
-        )
+        guard let mediaURL = URL.init(string: url) else {
+            DLog("invalid mediaURL")
+            return
+        }
 
-        let castSession = GCKCastContext.sharedInstance().sessionManager.currentCastSession
-        castSession?.remoteMediaClient?.loadMedia(mediaInfo, autoplay: true)
+        let mediaInfoBuilder = GCKMediaInformationBuilder.init(contentURL: mediaURL)
+        mediaInfoBuilder.streamType = GCKMediaStreamType.live;
+        mediaInfoBuilder.contentType = "video/mp4"
+        mediaInfoBuilder.metadata = mediaMetadata;
+        let mediaInfo = mediaInfoBuilder.build()
+
+        if let request = GCKCastContext.sharedInstance().sessionManager.currentSession?.remoteMediaClient?.loadMedia(mediaInfo) {
+          request.delegate = self
+        }
     }
 
     func sessionManager(_ sessionManager: GCKSessionManager, didStart session: GCKSession) {
