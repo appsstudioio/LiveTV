@@ -11,19 +11,17 @@ import Combine
 final class VideoPlayerViewModel {
 
     // MARK: - variables
-    var videoUrl: String
-    var titleName: String
+    let info: VideoPlayerModel
 
     // MARK: - functions
-    init(videoUrl: String, titleName: String) {
-        self.videoUrl = videoUrl
-        self.titleName = titleName
+    init(item: VideoPlayerModel) {
+        self.info = item
     }
 }
 
 extension VideoPlayerViewModel {
     func getTimeTableUrlLink() -> String {
-        let query = "\(titleName) 편성표".addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        let query = "\(info.titleName) 편성표".addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
         return "https://m.search.naver.com/search.naver?query=\(query)"
     }
 }

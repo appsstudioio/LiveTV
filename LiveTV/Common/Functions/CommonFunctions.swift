@@ -66,6 +66,10 @@ class CommonFunctions {
            }
        }
    }
+
+    static var isIOS: Bool {
+        return (UIDevice.current.userInterfaceIdiom == .phone)
+    }
 }
 
 // MARK: - SDK Config & app setting

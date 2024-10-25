@@ -25,12 +25,6 @@ final class ChannelListView: UIView {
 
     let collectionView = UICollectionView(frame:CGRect.zero, collectionViewLayout: UICollectionViewLayout()).then {
         $0.backgroundColor = UIColor.named(.backgroundColor)
-        let pagerCollectionViewLayout = UICollectionViewFlowLayout()
-        pagerCollectionViewLayout.minimumInteritemSpacing = 16
-        pagerCollectionViewLayout.minimumLineSpacing = 10
-        pagerCollectionViewLayout.scrollDirection = .vertical
-        pagerCollectionViewLayout.sectionInset = UIEdgeInsets(top: 16, left: 16, bottom: 16, right: 16)
-        $0.collectionViewLayout = pagerCollectionViewLayout
         $0.register(ChannelListCell.self, forCellWithReuseIdentifier: ChannelListCell.identifier)
         $0.showsHorizontalScrollIndicator = false
         $0.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
@@ -132,6 +126,19 @@ final class ChannelListView: UIView {
         }
 
         collectionView.addSubview(refreshControl)
+        let pagerCollectionViewLayout = UICollectionViewFlowLayout()
+        if CommonFunctions.isIOS {
+            pagerCollectionViewLayout.minimumInteritemSpacing = 16
+            pagerCollectionViewLayout.minimumLineSpacing = 10
+            pagerCollectionViewLayout.scrollDirection = .vertical
+            pagerCollectionViewLayout.sectionInset = UIEdgeInsets(top: 16, left: 16, bottom: 16, right: 16)
+        } else {
+            pagerCollectionViewLayout.minimumInteritemSpacing = 0
+            pagerCollectionViewLayout.minimumLineSpacing = 0
+            pagerCollectionViewLayout.scrollDirection = .vertical
+            pagerCollectionViewLayout.sectionInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+        }
+        collectionView.collectionViewLayout = pagerCollectionViewLayout
     }
 }
 

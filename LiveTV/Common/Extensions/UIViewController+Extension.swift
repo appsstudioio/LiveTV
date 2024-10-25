@@ -15,15 +15,11 @@ import LocalAuthentication
 
 extension UIViewController {
     func showLoading(_ text: String? = nil) {
-        DispatchQueue.main.async {
-            ProgressHUD.animate(text, interaction: false)
-        }
+        ProgressHUD.animate(text, interaction: false)
     }
 
     func hideLoading() {
-        DispatchQueue.main.async {
-            ProgressHUD.dismiss()
-        }
+        ProgressHUD.dismiss()
     }
 }
 
@@ -32,9 +28,11 @@ extension UIViewController {
     // MARK: - Alert
     func alertWith(title: String = CommonUtils.getAppName,
                    message: String) {
-        let alertView = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        alertView.addAction(UIAlertAction(title: "확인", style: .default, handler: nil))
-        present(alertView, animated: true, completion: nil)
+        DispatchQueue.main.async {
+            let alertView = UIAlertController(title: title, message: message, preferredStyle: .alert)
+            alertView.addAction(UIAlertAction(title: "확인", style: .default, handler: nil))
+            self.present(alertView, animated: true, completion: nil)
+        }
     }
 
     func alertConfirmWith(title: String = CommonUtils.getAppName,
@@ -48,26 +46,29 @@ extension UIViewController {
         if titleStr == "" {
             titleStr = CommonUtils.getAppName
         }
-
-        let alertView = UIAlertController(title: titleStr, message: message, preferredStyle: .alert)
-        alertView.addAction(UIAlertAction(title: cancleButton, style: cancleButtonStyle, handler: { (_) in
-            completionHandler(false)
-        }))
-        alertView.addAction(UIAlertAction(title: okayButton, style: okayButtonStyle, handler: { (_) in
-            completionHandler(true)
-        }))
-        present(alertView, animated: true, completion: nil)
+        DispatchQueue.main.async {
+            let alertView = UIAlertController(title: titleStr, message: message, preferredStyle: .alert)
+            alertView.addAction(UIAlertAction(title: cancleButton, style: cancleButtonStyle, handler: { (_) in
+                completionHandler(false)
+            }))
+            alertView.addAction(UIAlertAction(title: okayButton, style: okayButtonStyle, handler: { (_) in
+                completionHandler(true)
+            }))
+            self.present(alertView, animated: true, completion: nil)
+        }
     }
 
     func alertWith(title: String = CommonUtils.getAppName,
                    message: String,
                    okayButton: String = "확인",
                    completionHandler: @escaping (Bool) -> Void) {
-        let alertView = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        alertView.addAction(UIAlertAction(title: okayButton, style: .default, handler: { (_) in
-            completionHandler(true)
-        }))
-        present(alertView, animated: true, completion: nil)
+        DispatchQueue.main.async {
+            let alertView = UIAlertController(title: title, message: message, preferredStyle: .alert)
+            alertView.addAction(UIAlertAction(title: okayButton, style: .default, handler: { (_) in
+                completionHandler(true)
+            }))
+            self.present(alertView, animated: true, completion: nil)
+        }
     }
 
     func showCameraView(allowsEditing: Bool = false, mediaTypes: [String] = []) {

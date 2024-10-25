@@ -117,21 +117,25 @@ final class VideoPlayerViewController: BaseViewController {
 
         castButton.tapPublisher.sink { [weak self] in
             guard let self = self else { return }
-            self.castMedia(url: self.viewModel.videoUrl, title: self.viewModel.titleName)
+            self.castMedia(url: self.viewModel.info.videoUrl, title: self.viewModel.info.titleName)
         }.store(in: &cancellables)
 
         videoPlay()
     }
 
     private func setupUI() {
-        setNavigationBarTitle(viewModel.titleName)
-        hideNavigationLeftButton(hidden: false, button: backButton, buttonSize: CGSize(width: 24, height: 24))
+        setNavigationBarTitle(viewModel.info.titleName)
+        if CommonFunctions.isIOS {
+            hideNavigationLeftButton(hidden: false, button: backButton, buttonSize: CGSize(width: 24, height: 24))
+        } else {
+            hideNavigationLeftButton(hidden: true)
+        }
 
         let infoItem = UIBarButtonItem.buttonToBarButtonItem(infoButton)
         let castItem = UIBarButtonItem.buttonToBarButtonItem(castButton)
         navigationItem.rightBarButtonItems = [infoItem, castItem]
 
-        guard let url = URL(string: viewModel.videoUrl) else {
+        guard let url = URL(string: viewModel.info.videoUrl) else {
             self.alertWith(message: "재생 가능한 동영상을 찾을 수 없습니다!") { _ in
                 self.moveBack()
             }
