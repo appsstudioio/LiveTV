@@ -4,7 +4,6 @@
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23084"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
-        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -17,52 +16,60 @@
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="n9y-4U-fAT">
-                                <rect key="frame" x="16" y="366" width="361" height="120"/>
-                                <color key="backgroundColor" name="backgroundColor"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="120" id="0jV-Nw-tvc"/>
-                                </constraints>
-                                <string key="text">라이브 티비
-📺</string>
-                                <fontDescription key="fontDescription" type="boldSystem" pointSize="40"/>
-                                <color key="textColor" name="contentPrimary"/>
-                                <nil key="highlightedColor"/>
-                            </label>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="gradient_dark" translatesAutoresizingMaskIntoConstraints="NO" id="IHZ-NM-QaS">
+                                <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                            </imageView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="App Studio" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="gY0-ih-GY7">
-                                <rect key="frame" x="160.66666666666666" y="761" width="72" height="17"/>
-                                <color key="backgroundColor" name="backgroundColor"/>
+                                <rect key="frame" x="160.66666666666666" y="765" width="72" height="17"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <color key="textColor" name="contentTertiary"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="icon_colorbar" translatesAutoresizingMaskIntoConstraints="NO" id="18O-l6-c13">
+                                <rect key="frame" x="94.666666666666686" y="262" width="204" height="168"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="204" id="YdH-fc-GI5"/>
+                                    <constraint firstAttribute="height" constant="168" id="fk3-rV-0Hb"/>
+                                </constraints>
+                            </imageView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="실시간 방송" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="n9y-4U-fAT">
+                                <rect key="frame" x="124.00000000000001" y="442" width="145.33333333333337" height="44"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="44" id="GWk-QZ-s0c"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="32"/>
+                                <color key="textColor" name="contentWhite"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
-                        <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
-                            <constraint firstItem="n9y-4U-fAT" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="0ZA-gn-5c8"/>
-                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="n9y-4U-fAT" secondAttribute="trailing" constant="16" id="79H-5Q-HRA"/>
-                            <constraint firstItem="n9y-4U-fAT" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="16" id="QZn-7s-mPF"/>
+                            <constraint firstItem="IHZ-NM-QaS" firstAttribute="trailing" secondItem="Ze5-6b-2t3" secondAttribute="trailing" id="Gbb-hJ-UHo"/>
+                            <constraint firstItem="n9y-4U-fAT" firstAttribute="centerX" secondItem="18O-l6-c13" secondAttribute="centerX" id="HKH-Rr-2MY"/>
+                            <constraint firstItem="IHZ-NM-QaS" firstAttribute="leading" secondItem="Ze5-6b-2t3" secondAttribute="leading" id="JfA-As-IHj"/>
+                            <constraint firstItem="IHZ-NM-QaS" firstAttribute="top" secondItem="Ze5-6b-2t3" secondAttribute="top" id="L9O-f7-fWh"/>
+                            <constraint firstAttribute="bottom" secondItem="IHZ-NM-QaS" secondAttribute="bottom" id="QcA-mN-8o8"/>
+                            <constraint firstItem="18O-l6-c13" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" constant="-80" id="RkS-bN-kQe"/>
                             <constraint firstItem="gY0-ih-GY7" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="aFb-fq-oHd"/>
-                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="gY0-ih-GY7" secondAttribute="bottom" constant="40" id="c8e-8s-HVB"/>
-                            <constraint firstItem="n9y-4U-fAT" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="cw7-27-WnA"/>
+                            <constraint firstItem="18O-l6-c13" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="ax7-kq-5FL"/>
+                            <constraint firstAttribute="bottom" secondItem="gY0-ih-GY7" secondAttribute="bottom" constant="70" id="c8e-8s-HVB"/>
+                            <constraint firstItem="n9y-4U-fAT" firstAttribute="top" secondItem="18O-l6-c13" secondAttribute="bottom" constant="12" id="fXl-5P-yjX"/>
                         </constraints>
                     </view>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="iYj-Kq-Ea1" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="53" y="375"/>
+            <point key="canvasLocation" x="52.671755725190835" y="374.64788732394368"/>
         </scene>
     </scenes>
     <resources>
-        <namedColor name="backgroundColor">
-            <color red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-        </namedColor>
-        <namedColor name="contentPrimary">
-            <color red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-        </namedColor>
+        <image name="gradient_dark" width="100" height="100"/>
+        <image name="icon_colorbar" width="194" height="160"/>
         <namedColor name="contentTertiary">
             <color red="0.36899998784065247" green="0.36899998784065247" blue="0.36899998784065247" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="contentWhite">
+            <color red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>

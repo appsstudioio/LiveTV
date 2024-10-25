@@ -123,87 +123,89 @@ class ToastView {
     var cancellables = Set<AnyCancellable>() // Rx -> DisposeBag
 
     static func show(_ type: ToastViewType = .success, message: String, option: ToastViewOption = ToastViewOption()) {
-        guard let mainWindow = UIApplication.key else { return }
+        DispatchQueue.main.async {
+            guard let mainWindow = UIApplication.key else { return }
 
-        guard let container = mainWindow.viewWithTag(ToastView.toastViewTag) else {
-            let container = ToastContainerView().then {
-                $0.backgroundColor = type.backgroundColor
-                $0.tag = ToastView.toastViewTag
-                $0.isUserInteractionEnabled = true
-            }
-
-            let iconImage = UIImageView().then {
-                $0.image = type.icon
-                $0.tintColor = type.fontColor
-            }
-
-            let messageLabel = UILabel().then {
-                $0.numberOfLines = 0
-                if let attributedText = option.attributedText {
-                    $0.attributedText = attributedText
-                } else {
-                    $0.attributedText = message.toAttributed(fontType: .r14px, color: type.fontColor, alignment: .left)
+            guard let container = mainWindow.viewWithTag(ToastView.toastViewTag) else {
+                let container = ToastContainerView().then {
+                    $0.backgroundColor = type.backgroundColor
+                    $0.tag = ToastView.toastViewTag
+                    $0.isUserInteractionEnabled = true
                 }
-            }
 
-            container.addSubview(iconImage)
-            container.addSubview(messageLabel)
-            mainWindow.addSubview(container)
+                let iconImage = UIImageView().then {
+                    $0.image = type.icon
+                    $0.tintColor = type.fontColor
+                }
 
-            iconImage.snp.makeConstraints {
-                $0.centerY.equalToSuperview()
-                $0.leading.equalToSuperview().inset(24)
-                $0.width.height.equalTo(24)
-            }
+                let messageLabel = UILabel().then {
+                    $0.numberOfLines = 0
+                    if let attributedText = option.attributedText {
+                        $0.attributedText = attributedText
+                    } else {
+                        $0.attributedText = message.toAttributed(fontType: .r14px, color: type.fontColor, alignment: .left)
+                    }
+                }
 
-            messageLabel.snp.makeConstraints {
-                $0.top.bottom.equalToSuperview().inset(12)
-                $0.leading.equalTo(iconImage.snp.trailing).offset(8)
-                $0.trailing.equalToSuperview().inset(24)
-                $0.height.greaterThanOrEqualTo(24)
-            }
+                container.addSubview(iconImage)
+                container.addSubview(messageLabel)
+                mainWindow.addSubview(container)
 
-            container.snp.makeConstraints {
-                $0.left.right.equalToSuperview().inset(20)
-                switch option.position {
-                case .top:
-                    $0.top.equalToSuperview().inset(16 + UIApplication.shared.safeAreaInsets.top)
-                case .center:
+                iconImage.snp.makeConstraints {
                     $0.centerY.equalToSuperview()
-                case .bottom:
-                    $0.bottom.equalToSuperview().inset(16 + UIApplication.shared.safeAreaInsets.bottom)
+                    $0.leading.equalToSuperview().inset(24)
+                    $0.width.height.equalTo(24)
                 }
-            }
-            mainWindow.bringSubviewToFront(container)
 
-            container.layer.add(option.position.showAnimation, forKey: "SnackbarShowAnimation")
+                messageLabel.snp.makeConstraints {
+                    $0.top.bottom.equalToSuperview().inset(12)
+                    $0.leading.equalTo(iconImage.snp.trailing).offset(8)
+                    $0.trailing.equalToSuperview().inset(24)
+                    $0.height.greaterThanOrEqualTo(24)
+                }
 
-            guard option.delay > 0 else {
+                container.snp.makeConstraints {
+                    $0.left.right.equalToSuperview().inset(20)
+                    switch option.position {
+                    case .top:
+                        $0.top.equalToSuperview().inset(16 + UIApplication.shared.safeAreaInsets.top)
+                    case .center:
+                        $0.centerY.equalToSuperview()
+                    case .bottom:
+                        $0.bottom.equalToSuperview().inset(16 + UIApplication.shared.safeAreaInsets.bottom)
+                    }
+                }
+                mainWindow.bringSubviewToFront(container)
+
+                container.layer.add(option.position.showAnimation, forKey: "SnackbarShowAnimation")
+
+                guard option.delay > 0 else {
+                    return
+                }
+
+                DispatchQueue.main.asyncAfter(deadline: .now()+option.delay, execute: {
+                    let animaiton = option.position.hiddenAnimation
+                    container.layer.add(animaiton, forKey: "SnackbarHiddenAnimation")
+                    container.isHidden = true
+                    DispatchQueue.main.asyncAfter(deadline: .now()+animaiton.duration, execute: {
+                        container.removeFromSuperview()
+                    })
+                })
                 return
             }
+            container.backgroundColor = type.backgroundColor
 
-            DispatchQueue.main.asyncAfter(deadline: .now()+option.delay, execute: {
-                let animaiton = option.position.hiddenAnimation
-                container.layer.add(animaiton, forKey: "SnackbarHiddenAnimation")
-                container.isHidden = true
-                DispatchQueue.main.asyncAfter(deadline: .now()+animaiton.duration, execute: {
-                    container.removeFromSuperview()
-                })
-            })
-            return
-        }
-        container.backgroundColor = type.backgroundColor
-
-        if let messageLabel = container.subviews.filter({ $0.isKind(of: UILabel.self) }).first as? UILabel {
-            if let attributedText = option.attributedText {
-                messageLabel.attributedText = attributedText
-            } else {
-                messageLabel.attributedText = message.toAttributed(fontType: .r14px, color: type.fontColor, alignment: .left)
+            if let messageLabel = container.subviews.filter({ $0.isKind(of: UILabel.self) }).first as? UILabel {
+                if let attributedText = option.attributedText {
+                    messageLabel.attributedText = attributedText
+                } else {
+                    messageLabel.attributedText = message.toAttributed(fontType: .r14px, color: type.fontColor, alignment: .left)
+                }
             }
-        }
 
-        if let iconImage = container.subviews.filter({ $0.isKind(of: UIImageView.self) }).first as? UIImageView {
-            iconImage.image = type.icon
+            if let iconImage = container.subviews.filter({ $0.isKind(of: UIImageView.self) }).first as? UIImageView {
+                iconImage.image = type.icon
+            }
         }
     }
 }
