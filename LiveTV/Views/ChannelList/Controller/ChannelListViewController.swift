@@ -19,20 +19,14 @@ final class ChannelListViewController: BaseViewController {
 
     override func loadView() {
         super.loadView()
-        setupUI()
     }
 
     // MARK: - viewDidLoad()
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        setupUI()
         setBinding()
-
         HTTPCookieStorage.shared.cookieAcceptPolicy = .always
-        let configObject = URLSessionConfiguration.ephemeral
-        if configObject.httpCookieAcceptPolicy != .always {
-            configObject.httpCookieAcceptPolicy = .always
-        }
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -140,6 +134,8 @@ final class ChannelListViewController: BaseViewController {
 
             webView.navigationDelegate = self
             webView.allowsBackForwardNavigationGestures = false
+            // 쿠키를 동기화
+            syncCookiesToWebView(webView)
 #if DEVELOP
             if #available(iOS 16.4, *) {
                 webView.isInspectable = true
@@ -160,13 +156,20 @@ final class ChannelListViewController: BaseViewController {
         setNavigationBarTitle("채널 목록")
 
         subViews.snp.makeConstraints {
-            $0.top.equalTo(self.view.safeAreaLayoutGuide.snp.top)
-            $0.leading.trailing.bottom.equalToSuperview()
+            if CommonFunctions.isIOS {
+                $0.top.equalTo(self.view.safeAreaLayoutGuide.snp.top)
+                $0.leading.trailing.bottom.equalToSuperview()
+            } else {
+                $0.edges.equalTo(self.view.safeAreaLayoutGuide)
+            }
         }
 
         subViews.webView.navigationDelegate = self
         subViews.webView.uiDelegate = self
         subViews.webView.allowsBackForwardNavigationGestures = true
+        // 쿠키를 동기화
+        syncCookiesToWebView(subViews.webView)
+
 #if DEVELOP
         if #available(iOS 16.4, *) {
             subViews.webView.isInspectable = true
@@ -192,6 +195,18 @@ final class ChannelListViewController: BaseViewController {
 
 // MARK: - extensions
 extension ChannelListViewController {
+
+    // 전역 쿠키를 WKWebView의 쿠키 저장소에 추가하는 함수
+    func syncCookiesToWebView(_ webView: WKWebView) {
+        // HTTPCookieStorage에서 모든 쿠키 가져오기
+        let cookies = HTTPCookieStorage.shared.cookies ?? []
+
+        // WKHTTPCookieStore에 있는 쿠키에 추가
+        let cookieStore = webView.configuration.websiteDataStore.httpCookieStore
+        for cookie in cookies {
+            cookieStore.setCookie(cookie)
+        }
+    }
 
     @objc private func loadWebView() {
         if let request = viewModel.createRequest() {
@@ -312,8 +327,13 @@ extension ChannelListViewController: UICollectionViewDelegate {
 
 extension ChannelListViewController: UICollectionViewDelegateFlowLayout {
     public func collectionView(_ collectionView: UICollectionView,layout collectionViewLayout: UICollectionViewLayout,sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let boxSize = ((UIScreen.main.bounds.width - (16*3)) / 2)
-        return CGSize.init(width: boxSize, height: boxSize/2)
+        if CommonFunctions.isIOS {
+            let boxSize = ((UIScreen.main.bounds.width - (16*3)) / 2)
+            return CGSize.init(width: boxSize, height: boxSize/2)
+        } else {
+            return CGSize.init(width: collectionView.bounds.width, height: 42)
+        }
+
     }
 }
 
@@ -328,9 +348,16 @@ extension ChannelListViewController: WKScriptMessageHandler {
                 DLog("메타 리프레시 감지: \(videoUrl)")
                 // 추가 처리 로직 구현 가능
                 let titleName = viewModel.selectedChannel?.name ?? ""
-                let videoViewModel = VideoPlayerViewModel(videoUrl: videoUrl, titleName: titleName)
-                let videoPlayerVC = VideoPlayerViewController(viewModel: videoViewModel)
-                self.pushView(videoPlayerVC)
+                let videoData = VideoPlayerModel(videoUrl: videoUrl, titleName: titleName)
+                if CommonFunctions.isIOS {
+                    let videoViewModel = VideoPlayerViewModel(item: videoData)
+                    let videoPlayerVC = VideoPlayerViewController(viewModel: videoViewModel)
+                    self.pushView(videoPlayerVC)
+                } else {
+                    NotificationCenter.default.post(name: NotificationList.showChannelLoad.name,
+                                                    object: videoData,
+                                                    userInfo: nil)
+                }
             }
         }
     }
@@ -403,8 +430,12 @@ extension ChannelListViewController: WKNavigationDelegate {
     func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
         if let statusCode = (navigationResponse.response as? HTTPURLResponse)?.statusCode {
             DLog("#### \(#function) :: statusCode :: \(statusCode)")
+            if statusCode >= 200 && statusCode <= 299 {
+                decisionHandler(.allow)
+                return
+            }
         }
-        decisionHandler(.allow)
+        decisionHandler(.cancel)
     }
 }
 
