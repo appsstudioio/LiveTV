@@ -7,18 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		3E6B2B1F2CC0EAB900EED566 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 3E6B2B1E2CC0EAB900EED566 /* Kingfisher */; };
-		3E6B2B222CC0EB3F00EED566 /* CommonUtils in Frameworks */ = {isa = PBXBuildFile; productRef = 3E6B2B212CC0EB3F00EED566 /* CommonUtils */; };
 		3E6B2B252CC0EB6C00EED566 /* LookinServer in Frameworks */ = {isa = PBXBuildFile; productRef = 3E6B2B242CC0EB6C00EED566 /* LookinServer */; };
 		3E6B2B282CC0EBA500EED566 /* ProgressHUD in Frameworks */ = {isa = PBXBuildFile; productRef = 3E6B2B272CC0EBA500EED566 /* ProgressHUD */; };
 		3E6B2B2B2CC0EC5800EED566 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 3E6B2B2A2CC0EC5800EED566 /* SnapKit */; };
 		3E6B2B392CC0EC9F00EED566 /* Then in Frameworks */ = {isa = PBXBuildFile; productRef = 3E6B2B382CC0EC9F00EED566 /* Then */; };
 		3E6B2B9D2CC1066C00EED566 /* SwiftSoup in Frameworks */ = {isa = PBXBuildFile; productRef = 3E6B2B9C2CC1066C00EED566 /* SwiftSoup */; };
-		3E74DA0E2CC6161D0069580B /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 3E74DA0D2CC6161D0069580B /* FirebaseAnalytics */; };
-		3E74DA102CC6161D0069580B /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 3E74DA0F2CC6161D0069580B /* FirebaseCore */; };
-		3E74DA122CC6161D0069580B /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = 3E74DA112CC6161D0069580B /* FirebaseCrashlytics */; };
-		3E74DA142CC6161D0069580B /* FirebaseFunctions in Frameworks */ = {isa = PBXBuildFile; productRef = 3E74DA132CC6161D0069580B /* FirebaseFunctions */; };
-		3E74DA162CC6161D0069580B /* FirebasePerformance in Frameworks */ = {isa = PBXBuildFile; productRef = 3E74DA152CC6161D0069580B /* FirebasePerformance */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -78,17 +71,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3E6B2B1F2CC0EAB900EED566 /* Kingfisher in Frameworks */,
 				3E6B2B392CC0EC9F00EED566 /* Then in Frameworks */,
-				3E74DA162CC6161D0069580B /* FirebasePerformance in Frameworks */,
-				3E74DA0E2CC6161D0069580B /* FirebaseAnalytics in Frameworks */,
 				3E6B2B282CC0EBA500EED566 /* ProgressHUD in Frameworks */,
 				3E6B2B252CC0EB6C00EED566 /* LookinServer in Frameworks */,
 				3E6B2B9D2CC1066C00EED566 /* SwiftSoup in Frameworks */,
-				3E6B2B222CC0EB3F00EED566 /* CommonUtils in Frameworks */,
-				3E74DA122CC6161D0069580B /* FirebaseCrashlytics in Frameworks */,
-				3E74DA102CC6161D0069580B /* FirebaseCore in Frameworks */,
-				3E74DA142CC6161D0069580B /* FirebaseFunctions in Frameworks */,
 				3E6B2B2B2CC0EC5800EED566 /* SnapKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -133,18 +119,11 @@
 			);
 			name = LiveTV;
 			packageProductDependencies = (
-				3E6B2B1E2CC0EAB900EED566 /* Kingfisher */,
-				3E6B2B212CC0EB3F00EED566 /* CommonUtils */,
 				3E6B2B242CC0EB6C00EED566 /* LookinServer */,
 				3E6B2B272CC0EBA500EED566 /* ProgressHUD */,
 				3E6B2B2A2CC0EC5800EED566 /* SnapKit */,
 				3E6B2B382CC0EC9F00EED566 /* Then */,
 				3E6B2B9C2CC1066C00EED566 /* SwiftSoup */,
-				3E74DA0D2CC6161D0069580B /* FirebaseAnalytics */,
-				3E74DA0F2CC6161D0069580B /* FirebaseCore */,
-				3E74DA112CC6161D0069580B /* FirebaseCrashlytics */,
-				3E74DA132CC6161D0069580B /* FirebaseFunctions */,
-				3E74DA152CC6161D0069580B /* FirebasePerformance */,
 			);
 			productName = LiveTV;
 			productReference = 3E6B2AF52CC0E7DA00EED566 /* LiveTV.app */;
@@ -175,14 +154,13 @@
 			mainGroup = 3E6B2AEC2CC0E7DA00EED566;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				3E6B2B1D2CC0EAB900EED566 /* XCRemoteSwiftPackageReference "Kingfisher" */,
-				3E6B2B202CC0EB3F00EED566 /* XCRemoteSwiftPackageReference "CommonUtils" */,
 				3E6B2B232CC0EB6C00EED566 /* XCRemoteSwiftPackageReference "LookinServer" */,
 				3E6B2B262CC0EBA500EED566 /* XCRemoteSwiftPackageReference "ProgressHUD" */,
 				3E6B2B292CC0EC5800EED566 /* XCRemoteSwiftPackageReference "SnapKit" */,
 				3E6B2B372CC0EC9F00EED566 /* XCRemoteSwiftPackageReference "Then" */,
 				3E6B2B9B2CC1066C00EED566 /* XCRemoteSwiftPackageReference "SwiftSoup" */,
-				3E74DA0C2CC6161D0069580B /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				3EC420A42CD09C4000DAF179 /* XCRemoteSwiftPackageReference "CommonUtils" */,
+				3E6C37A22CD0A23D00D5D3E1 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 3E6B2AF62CC0E7DA00EED566 /* Products */;
@@ -230,7 +208,7 @@
 				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = LiveTV/Resources/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = LiveTV;
+				INFOPLIST_KEY_CFBundleDisplayName = "$(inherited)";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.entertainment";
 				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "로컬 네트워크를 사용하여 WiFi 네트워크에서 Cast 지원 기기를 검색합니다.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -261,13 +239,14 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = "$(inherited)";
 				DEVELOPMENT_TEAM = 289642M683;
 				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = LiveTV/Resources/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = LiveTV;
+				INFOPLIST_KEY_CFBundleDisplayName = "$(inherited)";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.entertainment";
 				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "로컬 네트워크를 사용하여 WiFi 네트워크에서 Cast 지원 기기를 검색합니다.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -282,6 +261,7 @@
 				MARKETING_VERSION = "$(inherited)";
 				PRODUCT_BUNDLE_IDENTIFIER = "$(inherited)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -434,22 +414,6 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		3E6B2B1D2CC0EAB900EED566 /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/onevcat/Kingfisher";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 8.1.0;
-			};
-		};
-		3E6B2B202CC0EB3F00EED566 /* XCRemoteSwiftPackageReference "CommonUtils" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/appsstudioio/CommonUtils.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.3;
-			};
-		};
 		3E6B2B232CC0EB6C00EED566 /* XCRemoteSwiftPackageReference "LookinServer" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/QMUI/LookinServer/";
@@ -490,27 +454,25 @@
 				minimumVersion = 2.7.5;
 			};
 		};
-		3E74DA0C2CC6161D0069580B /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+		3E6C37A22CD0A23D00D5D3E1 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 11.3.0;
+				minimumVersion = 11.4.0;
+			};
+		};
+		3EC420A42CD09C4000DAF179 /* XCRemoteSwiftPackageReference "CommonUtils" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/appsstudioio/CommonUtils.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.3;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		3E6B2B1E2CC0EAB900EED566 /* Kingfisher */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 3E6B2B1D2CC0EAB900EED566 /* XCRemoteSwiftPackageReference "Kingfisher" */;
-			productName = Kingfisher;
-		};
-		3E6B2B212CC0EB3F00EED566 /* CommonUtils */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 3E6B2B202CC0EB3F00EED566 /* XCRemoteSwiftPackageReference "CommonUtils" */;
-			productName = CommonUtils;
-		};
 		3E6B2B242CC0EB6C00EED566 /* LookinServer */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 3E6B2B232CC0EB6C00EED566 /* XCRemoteSwiftPackageReference "LookinServer" */;
@@ -535,31 +497,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 3E6B2B9B2CC1066C00EED566 /* XCRemoteSwiftPackageReference "SwiftSoup" */;
 			productName = SwiftSoup;
-		};
-		3E74DA0D2CC6161D0069580B /* FirebaseAnalytics */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 3E74DA0C2CC6161D0069580B /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseAnalytics;
-		};
-		3E74DA0F2CC6161D0069580B /* FirebaseCore */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 3E74DA0C2CC6161D0069580B /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseCore;
-		};
-		3E74DA112CC6161D0069580B /* FirebaseCrashlytics */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 3E74DA0C2CC6161D0069580B /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseCrashlytics;
-		};
-		3E74DA132CC6161D0069580B /* FirebaseFunctions */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 3E74DA0C2CC6161D0069580B /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseFunctions;
-		};
-		3E74DA152CC6161D0069580B /* FirebasePerformance */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 3E74DA0C2CC6161D0069580B /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebasePerformance;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
