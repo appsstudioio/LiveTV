@@ -7,11 +7,17 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		3E6B2B252CC0EB6C00EED566 /* LookinServer in Frameworks */ = {isa = PBXBuildFile; productRef = 3E6B2B242CC0EB6C00EED566 /* LookinServer */; };
-		3E6B2B282CC0EBA500EED566 /* ProgressHUD in Frameworks */ = {isa = PBXBuildFile; productRef = 3E6B2B272CC0EBA500EED566 /* ProgressHUD */; };
-		3E6B2B2B2CC0EC5800EED566 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 3E6B2B2A2CC0EC5800EED566 /* SnapKit */; };
-		3E6B2B392CC0EC9F00EED566 /* Then in Frameworks */ = {isa = PBXBuildFile; productRef = 3E6B2B382CC0EC9F00EED566 /* Then */; };
-		3E6B2B9D2CC1066C00EED566 /* SwiftSoup in Frameworks */ = {isa = PBXBuildFile; productRef = 3E6B2B9C2CC1066C00EED566 /* SwiftSoup */; };
+		3E82D07F2CD0C4AA00CBB60B /* CommonUtils in Frameworks */ = {isa = PBXBuildFile; productRef = 3E82D07E2CD0C4AA00CBB60B /* CommonUtils */; };
+		3E82D0822CD0C4B300CBB60B /* SwiftSoup in Frameworks */ = {isa = PBXBuildFile; productRef = 3E82D0812CD0C4B300CBB60B /* SwiftSoup */; };
+		3E82D0852CD0C56700CBB60B /* Then in Frameworks */ = {isa = PBXBuildFile; productRef = 3E82D0842CD0C56700CBB60B /* Then */; };
+		3E82D0882CD0C5E900CBB60B /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 3E82D0872CD0C5E900CBB60B /* SnapKit */; };
+		3E82D08B2CD0C60300CBB60B /* ProgressHUD in Frameworks */ = {isa = PBXBuildFile; productRef = 3E82D08A2CD0C60300CBB60B /* ProgressHUD */; };
+		3E82D08E2CD0C61000CBB60B /* LookinServer in Frameworks */ = {isa = PBXBuildFile; productRef = 3E82D08D2CD0C61000CBB60B /* LookinServer */; };
+		3E99F12C2CD0B46F00E999D8 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 3E99F12B2CD0B46F00E999D8 /* FirebaseAnalytics */; };
+		3E99F12E2CD0B46F00E999D8 /* FirebaseAppDistribution-Beta in Frameworks */ = {isa = PBXBuildFile; productRef = 3E99F12D2CD0B46F00E999D8 /* FirebaseAppDistribution-Beta */; };
+		3E99F1302CD0B46F00E999D8 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 3E99F12F2CD0B46F00E999D8 /* FirebaseCore */; };
+		3E99F1322CD0B46F00E999D8 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = 3E99F1312CD0B46F00E999D8 /* FirebaseCrashlytics */; };
+		3E99F1342CD0B46F00E999D8 /* FirebasePerformance in Frameworks */ = {isa = PBXBuildFile; productRef = 3E99F1332CD0B46F00E999D8 /* FirebasePerformance */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -71,11 +77,17 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3E6B2B392CC0EC9F00EED566 /* Then in Frameworks */,
-				3E6B2B282CC0EBA500EED566 /* ProgressHUD in Frameworks */,
-				3E6B2B252CC0EB6C00EED566 /* LookinServer in Frameworks */,
-				3E6B2B9D2CC1066C00EED566 /* SwiftSoup in Frameworks */,
-				3E6B2B2B2CC0EC5800EED566 /* SnapKit in Frameworks */,
+				3E99F1342CD0B46F00E999D8 /* FirebasePerformance in Frameworks */,
+				3E82D0852CD0C56700CBB60B /* Then in Frameworks */,
+				3E82D08B2CD0C60300CBB60B /* ProgressHUD in Frameworks */,
+				3E99F12C2CD0B46F00E999D8 /* FirebaseAnalytics in Frameworks */,
+				3E82D07F2CD0C4AA00CBB60B /* CommonUtils in Frameworks */,
+				3E99F1322CD0B46F00E999D8 /* FirebaseCrashlytics in Frameworks */,
+				3E82D08E2CD0C61000CBB60B /* LookinServer in Frameworks */,
+				3E82D0822CD0C4B300CBB60B /* SwiftSoup in Frameworks */,
+				3E99F1302CD0B46F00E999D8 /* FirebaseCore in Frameworks */,
+				3E99F12E2CD0B46F00E999D8 /* FirebaseAppDistribution-Beta in Frameworks */,
+				3E82D0882CD0C5E900CBB60B /* SnapKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -119,11 +131,17 @@
 			);
 			name = LiveTV;
 			packageProductDependencies = (
-				3E6B2B242CC0EB6C00EED566 /* LookinServer */,
-				3E6B2B272CC0EBA500EED566 /* ProgressHUD */,
-				3E6B2B2A2CC0EC5800EED566 /* SnapKit */,
-				3E6B2B382CC0EC9F00EED566 /* Then */,
-				3E6B2B9C2CC1066C00EED566 /* SwiftSoup */,
+				3E99F12B2CD0B46F00E999D8 /* FirebaseAnalytics */,
+				3E99F12D2CD0B46F00E999D8 /* FirebaseAppDistribution-Beta */,
+				3E99F12F2CD0B46F00E999D8 /* FirebaseCore */,
+				3E99F1312CD0B46F00E999D8 /* FirebaseCrashlytics */,
+				3E99F1332CD0B46F00E999D8 /* FirebasePerformance */,
+				3E82D07E2CD0C4AA00CBB60B /* CommonUtils */,
+				3E82D0812CD0C4B300CBB60B /* SwiftSoup */,
+				3E82D0842CD0C56700CBB60B /* Then */,
+				3E82D0872CD0C5E900CBB60B /* SnapKit */,
+				3E82D08A2CD0C60300CBB60B /* ProgressHUD */,
+				3E82D08D2CD0C61000CBB60B /* LookinServer */,
 			);
 			productName = LiveTV;
 			productReference = 3E6B2AF52CC0E7DA00EED566 /* LiveTV.app */;
@@ -154,13 +172,13 @@
 			mainGroup = 3E6B2AEC2CC0E7DA00EED566;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				3E6B2B232CC0EB6C00EED566 /* XCRemoteSwiftPackageReference "LookinServer" */,
-				3E6B2B262CC0EBA500EED566 /* XCRemoteSwiftPackageReference "ProgressHUD" */,
-				3E6B2B292CC0EC5800EED566 /* XCRemoteSwiftPackageReference "SnapKit" */,
-				3E6B2B372CC0EC9F00EED566 /* XCRemoteSwiftPackageReference "Then" */,
-				3E6B2B9B2CC1066C00EED566 /* XCRemoteSwiftPackageReference "SwiftSoup" */,
-				3EC420A42CD09C4000DAF179 /* XCRemoteSwiftPackageReference "CommonUtils" */,
 				3E6C37A22CD0A23D00D5D3E1 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				3E82D07D2CD0C4AA00CBB60B /* XCRemoteSwiftPackageReference "CommonUtils" */,
+				3E82D0802CD0C4B300CBB60B /* XCRemoteSwiftPackageReference "SwiftSoup" */,
+				3E82D0832CD0C56700CBB60B /* XCRemoteSwiftPackageReference "Then" */,
+				3E82D0862CD0C5E900CBB60B /* XCRemoteSwiftPackageReference "SnapKit" */,
+				3E82D0892CD0C60300CBB60B /* XCRemoteSwiftPackageReference "ProgressHUD" */,
+				3E82D08C2CD0C61000CBB60B /* XCRemoteSwiftPackageReference "LookinServer" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 3E6B2AF62CC0E7DA00EED566 /* Products */;
@@ -414,46 +432,6 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		3E6B2B232CC0EB6C00EED566 /* XCRemoteSwiftPackageReference "LookinServer" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/QMUI/LookinServer/";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.2.8;
-			};
-		};
-		3E6B2B262CC0EBA500EED566 /* XCRemoteSwiftPackageReference "ProgressHUD" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/relatedcode/ProgressHUD.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 14.1.3;
-			};
-		};
-		3E6B2B292CC0EC5800EED566 /* XCRemoteSwiftPackageReference "SnapKit" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/SnapKit/SnapKit.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 5.7.1;
-			};
-		};
-		3E6B2B372CC0EC9F00EED566 /* XCRemoteSwiftPackageReference "Then" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/devxoul/Then";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 3.0.0;
-			};
-		};
-		3E6B2B9B2CC1066C00EED566 /* XCRemoteSwiftPackageReference "SwiftSoup" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/scinfu/SwiftSoup.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 2.7.5;
-			};
-		};
 		3E6C37A22CD0A23D00D5D3E1 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/firebase/firebase-ios-sdk.git";
@@ -462,7 +440,7 @@
 				minimumVersion = 11.4.0;
 			};
 		};
-		3EC420A42CD09C4000DAF179 /* XCRemoteSwiftPackageReference "CommonUtils" */ = {
+		3E82D07D2CD0C4AA00CBB60B /* XCRemoteSwiftPackageReference "CommonUtils" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/appsstudioio/CommonUtils.git";
 			requirement = {
@@ -470,33 +448,98 @@
 				minimumVersion = 1.0.3;
 			};
 		};
+		3E82D0802CD0C4B300CBB60B /* XCRemoteSwiftPackageReference "SwiftSoup" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/scinfu/SwiftSoup.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.7.5;
+			};
+		};
+		3E82D0832CD0C56700CBB60B /* XCRemoteSwiftPackageReference "Then" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/devxoul/Then";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.0.0;
+			};
+		};
+		3E82D0862CD0C5E900CBB60B /* XCRemoteSwiftPackageReference "SnapKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SnapKit/SnapKit.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.7.1;
+			};
+		};
+		3E82D0892CD0C60300CBB60B /* XCRemoteSwiftPackageReference "ProgressHUD" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/relatedcode/ProgressHUD.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 14.1.3;
+			};
+		};
+		3E82D08C2CD0C61000CBB60B /* XCRemoteSwiftPackageReference "LookinServer" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/QMUI/LookinServer/";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.2.8;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		3E6B2B242CC0EB6C00EED566 /* LookinServer */ = {
+		3E82D07E2CD0C4AA00CBB60B /* CommonUtils */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 3E6B2B232CC0EB6C00EED566 /* XCRemoteSwiftPackageReference "LookinServer" */;
-			productName = LookinServer;
+			package = 3E82D07D2CD0C4AA00CBB60B /* XCRemoteSwiftPackageReference "CommonUtils" */;
+			productName = CommonUtils;
 		};
-		3E6B2B272CC0EBA500EED566 /* ProgressHUD */ = {
+		3E82D0812CD0C4B300CBB60B /* SwiftSoup */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 3E6B2B262CC0EBA500EED566 /* XCRemoteSwiftPackageReference "ProgressHUD" */;
-			productName = ProgressHUD;
+			package = 3E82D0802CD0C4B300CBB60B /* XCRemoteSwiftPackageReference "SwiftSoup" */;
+			productName = SwiftSoup;
 		};
-		3E6B2B2A2CC0EC5800EED566 /* SnapKit */ = {
+		3E82D0842CD0C56700CBB60B /* Then */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 3E6B2B292CC0EC5800EED566 /* XCRemoteSwiftPackageReference "SnapKit" */;
-			productName = SnapKit;
-		};
-		3E6B2B382CC0EC9F00EED566 /* Then */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 3E6B2B372CC0EC9F00EED566 /* XCRemoteSwiftPackageReference "Then" */;
+			package = 3E82D0832CD0C56700CBB60B /* XCRemoteSwiftPackageReference "Then" */;
 			productName = Then;
 		};
-		3E6B2B9C2CC1066C00EED566 /* SwiftSoup */ = {
+		3E82D0872CD0C5E900CBB60B /* SnapKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 3E6B2B9B2CC1066C00EED566 /* XCRemoteSwiftPackageReference "SwiftSoup" */;
-			productName = SwiftSoup;
+			package = 3E82D0862CD0C5E900CBB60B /* XCRemoteSwiftPackageReference "SnapKit" */;
+			productName = SnapKit;
+		};
+		3E82D08A2CD0C60300CBB60B /* ProgressHUD */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3E82D0892CD0C60300CBB60B /* XCRemoteSwiftPackageReference "ProgressHUD" */;
+			productName = ProgressHUD;
+		};
+		3E82D08D2CD0C61000CBB60B /* LookinServer */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3E82D08C2CD0C61000CBB60B /* XCRemoteSwiftPackageReference "LookinServer" */;
+			productName = LookinServer;
+		};
+		3E99F12B2CD0B46F00E999D8 /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = FirebaseAnalytics;
+		};
+		3E99F12D2CD0B46F00E999D8 /* FirebaseAppDistribution-Beta */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = "FirebaseAppDistribution-Beta";
+		};
+		3E99F12F2CD0B46F00E999D8 /* FirebaseCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = FirebaseCore;
+		};
+		3E99F1312CD0B46F00E999D8 /* FirebaseCrashlytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = FirebaseCrashlytics;
+		};
+		3E99F1332CD0B46F00E999D8 /* FirebasePerformance */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = FirebasePerformance;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
