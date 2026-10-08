@@ -344,7 +344,7 @@ extension ChannelListViewController: WKScriptMessageHandler {
 
         if message.name == "metaRefreshHandler" {
             if let body = message.body as? [String: Any],
-               let videoUrl = body["url"] as? String {
+               let videoUrl = body["url"] as? String, videoUrl.isEmpty == false {
                 DLog("메타 리프레시 감지: \(videoUrl)")
                 // 추가 처리 로직 구현 가능
                 let titleName = viewModel.selectedChannel?.name ?? ""

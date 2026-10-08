@@ -8,8 +8,6 @@
 	<string>$(BASE_URL)</string>
 	<key>FirebaseServiceFile</key>
 	<string>$(FIREBASE_SERVICE_FILE_NAME)</string>
-	<key>ITSAppUsesNonExemptEncryption</key>
-	<false/>
 	<key>LSMinimumSystemVersion</key>
 	<string>12.3</string>
 	<key>NSAppTransportSecurity</key>
