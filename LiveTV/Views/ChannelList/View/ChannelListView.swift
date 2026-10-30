@@ -37,6 +37,10 @@ final class ChannelListView: UIView {
         }
     }
 
+    // true: 접힌 화면(한 칸)의 카드형 그리드, false: 펼친 화면 목록 칼럼의 한 줄 목록.
+    // 기기 종류가 아니라 split view의 접힘 상태로 정한다(iPhone Duo는 접고 펼 때 바뀐다).
+    private(set) var isCardStyle: Bool = true
+
     // MARK: - init()
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -91,23 +95,31 @@ final class ChannelListView: UIView {
         }
 
         collectionView.refreshControl = refreshControl
+        collectionView.collectionViewLayout = makeCollectionViewLayout(isCardStyle: isCardStyle)
+    }
+
+    private func makeCollectionViewLayout(isCardStyle: Bool) -> UICollectionViewFlowLayout {
         let pagerCollectionViewLayout = UICollectionViewFlowLayout()
-        if CommonFunctions.isIOS {
+        pagerCollectionViewLayout.scrollDirection = .vertical
+        // 좌우 safe area(iPhone Duo의 세로 바 등)는 ChannelListViewController의 insetForSectionAt에서 더한다.
+        if isCardStyle {
             pagerCollectionViewLayout.minimumInteritemSpacing = 16
             pagerCollectionViewLayout.minimumLineSpacing = 10
-            pagerCollectionViewLayout.scrollDirection = .vertical
             pagerCollectionViewLayout.sectionInset = UIEdgeInsets(top: 16, left: 16, bottom: 16, right: 16)
         } else {
             pagerCollectionViewLayout.minimumInteritemSpacing = 0
             pagerCollectionViewLayout.minimumLineSpacing = 0
-            pagerCollectionViewLayout.scrollDirection = .vertical
             pagerCollectionViewLayout.sectionInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
         }
-        collectionView.collectionViewLayout = pagerCollectionViewLayout
+        return pagerCollectionViewLayout
     }
 }
 
 // MARK: - extensions
 extension ChannelListView {
-    
+    func updateLayout(isCardStyle: Bool) {
+        guard self.isCardStyle != isCardStyle else { return }
+        self.isCardStyle = isCardStyle
+        collectionView.setCollectionViewLayout(makeCollectionViewLayout(isCardStyle: isCardStyle), animated: false)
+    }
 }

@@ -130,7 +130,10 @@ final class VideoPlayerViewController: BaseViewController {
 
     private func setupUI() {
         setNavigationBarTitle(viewModel.info.titleName)
-        if CommonFunctions.isIOS {
+        // 기기 종류가 아니라 실제로 어떻게 열렸는지로 정한다. 접힌 화면에서 목록 위에 push되었으면 뒤로 버튼을 두고,
+        // 펼친 화면의 상세 칼럼(네비게이션의 루트)이면 돌아갈 곳이 없으므로 숨긴다.
+        let isPushed = (navigationController?.viewControllers.first !== self)
+        if isPushed {
             navigationItem.hidesBackButton = true
             navigationItem.leftBarButtonItem = backButton
         } else {

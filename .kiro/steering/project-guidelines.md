@@ -20,7 +20,7 @@
 - 앱 이름: LiveTV (스토어 표시명 "실시간방송"). 한국 TV·라디오 채널 목록을 보여 주고 선택한 채널의 영상 스트림을 재생하는 iOS/iPadOS 앱이다.
 - 동작 방식: 서버(`BASE_URL`)의 `index.php`(TV 목록) HTML을 `WKWebView`로 로드하고, `SwiftSoup`으로 파싱해 채널 목록(`ChannelListModel`)을 만든다. 채널을 선택하면 해당 링크의 JavaScript를 웹뷰에서 실행하고, 주입한 스크립트(`metaRefreshHandler`)가 `<video>`의 URL을 전달하면 `AVPlayer`로 재생한다. Google Cast로 전송할 수도 있다.
 - 언어/프레임워크: Swift 5, UIKit (코드 기반 UI, SnapKit + Then), Combine (MVVM 바인딩).
-- 최소 지원: iOS 26.0 (`IPHONEOS_DEPLOYMENT_TARGET`, 타깃·프로젝트 설정 모두). iPhone·iPad 모두 지원 (`TARGETED_DEVICE_FAMILY = 1,2`). UI는 iOS 26 Liquid Glass 디자인을 따른다(6.4 참고).
+- 최소 지원: iOS 26.0 (`IPHONEOS_DEPLOYMENT_TARGET`, 타깃·프로젝트 설정 모두). iPhone·iPad 모두 지원 (`TARGETED_DEVICE_FAMILY = 1,2`). 접는 iPhone인 iPhone Duo도 지원하며, Xcode 27.1(iOS 27.1 SDK)의 iPhone Duo 시뮬레이터로 확인한다. UI는 iOS 26 Liquid Glass 디자인을 따른다(6.4 참고).
 - 저장소: `appsstudioio/LiveTV` (GitHub). 브랜치는 `main`, `develop`, `feature/*` 형태로 사용해 왔다.
 
 ## 2. 디렉터리 구조
@@ -30,13 +30,13 @@
 ```
 LiveTV/
 ├── AppDelegate.swift            # @main. Firebase, Kingfisher, ProgressHUD, GoogleCast 초기화
-├── SceneDelegate.swift          # iPhone: BaseNavigationController(ChannelList) / iPad: MainSplitViewController
+├── SceneDelegate.swift          # 모든 기기: MainSplitViewController (좁으면 한 칸으로 접힘)
 ├── Common/
 │   ├── BaseControllers/         # BaseViewController(+Extension), BaseNavigationController, BaseWebViewController
 │   ├── BaseModel/               # BaseModel.swift (공통 응답 모델, NotificationList)
 │   ├── BaseViewModel/           # BaseViewModel, BaseWebViewModel
 │   ├── Extensions/              # UIKit 확장 (UIViewController, UIImageView, UINavigationBar 등)
-│   └── Functions/               # CommonFunctions.swift (DLog, 모듈 @_exported import, SDK 설정, isIOS)
+│   └── Functions/               # CommonFunctions.swift (DLog, 모듈 @_exported import, SDK 설정)
 ├── Configurations/
 │   ├── GoogleService-Info.plist
 │   └── xcconfig/                # Develop.xcconfig(Debug), Release.xcconfig(Release)
@@ -50,8 +50,8 @@ LiveTV/
 └── Views/
     ├── ChannelList/             # 채널 목록. 검색은 Controller의 navigationItem.searchController. Controller / Model / View / ViewModel
     ├── VideoPlayer/             # 영상 재생(AVPlayer, Cast). Controller / Model / ViewModel
-    ├── MainSplit/               # iPad 전용 UISplitViewController (목록 | 상세)
-    ├── Empty/                   # iPad 상세 영역의 "채널을 선택하세요" 화면
+    ├── MainSplit/               # 앱 루트 UISplitViewController (펼침: 목록 | 상세, 접힘: 목록 → push). 접힘·펼침 때 재생 화면을 옮긴다
+    ├── Empty/                   # 펼친 화면 상세 영역의 "채널을 선택하세요" 화면
     └── CommonViews/             # 재사용 뷰 (ToastView)
 ```
 
@@ -77,7 +77,15 @@ LiveTV/
 - ViewModel 구조 (`ChannelListViewModel` 기준)
   - `struct Action`(View → ViewModel 입력), `struct State`(ViewModel → View 출력)을 중첩 선언하고 `var action`, `var state`로 보유한다. 사용하지 않는 `Action`은 주석 처리된 채로 두는 기존 방식이 있으나, 새 코드에서는 필요한 것만 선언한다.
   - 구독 해제는 `cancellables: Set<AnyCancellable>`에 `store(in:)`로 한다. 셀은 `prepareForReuse()`에서 초기화한다.
-- **iPhone / iPad 분기**: `CommonFunctions.isIOS`(= `.phone`)로 분기한다. iPhone은 `push`로 `VideoPlayerViewController`를 열고, iPad는 `NotificationList.showChannelLoad` 알림을 `MainSplitViewController`가 받아 secondary 영역을 교체한다. 화면을 추가·수정할 때는 두 기기 모두의 동작을 확인한다.
+- **접힘 / 펼침 분기 (iPhone Duo 대응)**: 기기 종류(`userInterfaceIdiom`)로 레이아웃을 고르지 않는다. iPhone Duo는 사용 중에 접고 펴면서 창 크기와 size class가 바뀌고, 펼친 iPhone도 regular 폭이 된다(Apple [Three steps to make your app shine on iPhone Duo](https://developer.apple.com/iphone-duo/prepare/)).
+  - 루트는 모든 기기에서 `MainSplitViewController`다. 기준은 `splitViewController?.isCollapsed`(없으면 접힘으로 본다).
+  - 접힘(한 칸): 목록은 카드형 그리드, 채널 선택 시 목록 네비게이션에 `VideoPlayerViewController`를 `push`한다. 재생 화면은 네비게이션 루트가 아니면 직접 만든 뒤로 버튼을 쓴다.
+  - 펼침(두 칸): 목록은 한 줄 목록형, 채널 선택 시 `NotificationList.showChannelLoad` 알림을 `MainSplitViewController`가 받아 secondary 영역을 교체한다.
+  - 접힘·펼침 전환은 `MainSplitViewController`의 `splitViewControllerDidCollapse`/`DidExpand`에서 처리한다. 보던 채널의 재생 화면을 새로 만들어 반대쪽(push ↔ secondary)으로 옮기고, `ChannelListViewController.updateLayoutStyle()`을 부른다. 접힐 때 상세를 목록 위에 자동으로 합치지 않도록 `topColumnForCollapsingToProposedTopColumn`은 `.primary`를 반환한다.
+  - 크기에 따른 레이아웃은 시작할 때 한 번이 아니라 `viewDidLayoutSubviews`(또는 `viewWillTransition(to:with:)`)에서 매번 다시 계산한다. 크기는 `view.bounds`, safe area는 `view.safeAreaInsets`나 `safeAreaLayoutGuide`에서 읽고 `UIApplication.shared.safeAreaInsets`나 기기 방향(`UIDevice.current.orientation`, `interfaceOrientation`), 특정 화면 크기 비교를 쓰지 않는다.
+  - iOS 27.1 SDK에서는 iPhone Duo의 툴바가 화면 옆에 세로로 붙는다. 세로 스크롤 목록은 좌우 safe area를 섹션 여백에 더한다(`ChannelListViewController`의 `insetForSectionAt`).
+  - 액션 시트는 넓은 화면에서 팝오버가 되므로 기기와 관계없이 `popoverPresentationController`의 기준 뷰(또는 `sourceItem`)를 지정한다.
+  - 화면을 추가·수정할 때는 일반 iPhone, iPad, iPhone Duo(접힘·펼침, 재생 중 전환) 동작을 모두 확인한다.
 - **화면 간 통지**: `Common/BaseModel/BaseModel.swift`의 `NotificationList` enum에 case와 `name`을 추가해서 사용한다. 문자열 이름을 직접 쓰지 않는다.
 - **API/호스트**: URL은 `Network/BaseHostUrlDefine.swift`의 `BaseUrlPathDefine`에 case를 추가하고 `url`에서 반환한다. 호스트는 `Info.plist`의 `BaseURL`(= xcconfig `BASE_URL`)에서 읽는다. 현재 Moya/Alamofire를 쓰지 않고 `WKWebView`와 `URLSession`을 직접 사용한다.
 - **웹뷰**: 모바일 User-Agent를 고정해서 쓰고(`customUserAgent`), 쿠키는 `HTTPCookieStorage` → `WKHTTPCookieStore`로 동기화한다. DEVELOP 빌드에서만 `isInspectable = true`를 켠다.
@@ -193,7 +201,7 @@ extension ChannelListViewController: UICollectionViewDelegate { … }
 - 색상: `UIColor.named(.contentPrimary)` 또는 `.named(...)`만 사용한다. 새 색상은 `Colors.xcassets`에 colorset을 추가하고 `ComponentColor`에 case를 추가한다. `UIColor(red:…)`나 hex 리터럴을 직접 쓰지 않는다(`progressHUDConfig` 예외 외).
 - 폰트·텍스트: `"문구".toAttributed(fontType: .sb15px, color: .named(.contentSecondary), alignment: .center)`로 `attributedText`에 설정한다. 폰트는 `ComponentFont`(`r`=regular, `sb`=semibold, `b`=bold + 크기 `08px…34px`)에서 고르고 `UIFont.systemFont`를 직접 쓰지 않는다.
 - 셀 재사용 식별자는 `Cell.identifier`(CommonUtils)를 쓴다.
-- 레이아웃이 iPhone/iPad에서 다르면 `CommonFunctions.isIOS`로 분기한다.
+- 레이아웃이 화면 크기에 따라 다르면 기기 종류가 아니라 split view 접힘 상태, size class, 사용 가능한 폭으로 분기한다(3장 "접힘 / 펼침 분기" 참고).
 - 사용자에게 보이는 알림은 `alertWith`, `alertConfirmWith`(UIViewController 확장), 토스트는 `ToastView.show(.error, message:)`, 로딩은 `showLoading`/`hideLoading` 또는 `ProgressHUD`를 사용한다.
 
 ### 6.4.1 Liquid Glass (iOS 26)
@@ -229,7 +237,7 @@ extension ChannelListViewController: UICollectionViewDelegate { … }
 
 ## 7. 작업 절차
 
-1. 요청 범위를 파악하고, 영향받는 화면(iPhone/iPad)과 공통 코드를 확인한다.
+1. 요청 범위를 파악하고, 영향받는 화면(iPhone/iPad/iPhone Duo 접힘·펼침)과 공통 코드를 확인한다.
 2. 같은 역할의 기존 파일을 열어 형식을 맞춘 뒤 구현한다. 공통 헬퍼가 있으면 재사용한다.
 3. 새 파일은 위 구조 규칙에 맞는 폴더에 만든다. 파일 시스템 동기화 그룹이므로 `project.pbxproj`는 수정하지 않는다.
 4. 빌드 설정·의존성·Info.plist를 건드렸다면 4·5장을 갱신한다.

@@ -183,11 +183,10 @@ extension UIViewController {
         }
         let cancel = UIAlertAction(title: "취소", style: .cancel, handler: nil)
         actionSheet.addAction(cancel)
-        if (UIDevice().userInterfaceIdiom == UIUserInterfaceIdiom.pad) {
-            actionSheet.popoverPresentationController?.sourceView = customView
-            actionSheet.popoverPresentationController?.sourceRect = customView?.frame ?? .zero
-            actionSheet.popoverPresentationController?.permittedArrowDirections = []
-        }
+        // 넓은 화면(iPad, 펼친 iPhone Duo)에서는 액션 시트가 팝오버로 바뀌므로 기기 종류와 관계없이 기준 뷰를 지정한다.
+        actionSheet.popoverPresentationController?.sourceView = customView
+        actionSheet.popoverPresentationController?.sourceRect = customView?.frame ?? .zero
+        actionSheet.popoverPresentationController?.permittedArrowDirections = []
         self.present(actionSheet, animated: true, completion: nil)
     }
 

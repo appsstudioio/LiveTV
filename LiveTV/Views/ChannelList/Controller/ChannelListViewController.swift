@@ -17,6 +17,15 @@ final class ChannelListViewController: BaseViewController {
     let viewModel = ChannelListViewModel()
     var videoWebView: WKWebView? // 비디오 플레이어 웹뷰
 
+    // 크기가 바뀌었을 때만 셀 크기를 다시 계산하려고 마지막 폭과 safe area를 기억한다.
+    private var lastCollectionViewWidth: CGFloat = 0
+    private var lastSafeAreaInsets: UIEdgeInsets = .zero
+
+    // split view가 접혀 있거나(한 칸) split view 밖에 있으면 카드형, 펼쳐져 있으면 목록형.
+    private var isCollapsedLayout: Bool {
+        return splitViewController?.isCollapsed ?? true
+    }
+
     // iOS 26: 검색 필드를 네비게이션 아이템에 두어야 시스템이 Liquid Glass를 적용한다.
     // 위치는 시스템 기본값을 따른다(iPhone은 하단 툴바 영역). 상단에 두려면 navigationItem.preferredSearchBarPlacement = .stacked.
     let searchController = UISearchController(searchResultsController: nil).then {
@@ -57,6 +66,20 @@ final class ChannelListViewController: BaseViewController {
 
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
+    }
+
+    // iPhone Duo는 사용 중에 접고 펴면서 크기가 바뀐다. 크기에 따른 레이아웃은 시작할 때 한 번이 아니라 여기서 매번 맞춘다.
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        updateLayoutStyle()
+        // 폭이나 좌우 safe area(세로 바 위치)가 바뀌면 셀 크기와 여백을 다시 계산한다.
+        let collectionViewWidth = subViews.collectionView.bounds.width
+        let safeAreaInsets = subViews.collectionView.safeAreaInsets
+        if lastCollectionViewWidth != collectionViewWidth || lastSafeAreaInsets != safeAreaInsets {
+            lastCollectionViewWidth = collectionViewWidth
+            lastSafeAreaInsets = safeAreaInsets
+            subViews.collectionView.collectionViewLayout.invalidateLayout()
+        }
     }
 
     override var hidesBottomBarWhenPushed: Bool {
@@ -170,15 +193,7 @@ final class ChannelListViewController: BaseViewController {
         navigationItem.hidesSearchBarWhenScrolling = false
         definesPresentationContext = true
 
-        subViews.snp.makeConstraints {
-            // 상단은 safe area가 아닌 view에 맞춰 목록이 Liquid Glass 네비게이션 바 아래로 스크롤되게 한다.
-            $0.top.equalToSuperview()
-            if CommonFunctions.isIOS {
-                $0.leading.trailing.bottom.equalToSuperview()
-            } else {
-                $0.leading.trailing.bottom.equalTo(self.view.safeAreaLayoutGuide)
-            }
-        }
+        makeSubViewsConstraints(isCardStyle: subViews.isCardStyle)
         // 화면 뒤의 목록용 WKWebView도 스크롤 뷰를 가지므로, 바의 스크롤 엣지 효과가 따라갈 스크롤 뷰를 지정한다.
         setContentScrollView(subViews.collectionView, for: .all)
 
@@ -197,6 +212,18 @@ final class ChannelListViewController: BaseViewController {
         subViews.collectionView.dataSource = self
 
         subViews.refreshControl.addTarget(self, action: #selector(loadWebView), for: UIControl.Event.valueChanged)
+    }
+
+    private func makeSubViewsConstraints(isCardStyle: Bool) {
+        subViews.snp.remakeConstraints {
+            // 상단은 safe area가 아닌 view에 맞춰 목록이 Liquid Glass 네비게이션 바 아래로 스크롤되게 한다.
+            $0.top.equalToSuperview()
+            if isCardStyle {
+                $0.leading.trailing.bottom.equalToSuperview()
+            } else {
+                $0.leading.trailing.bottom.equalTo(self.view.safeAreaLayoutGuide)
+            }
+        }
     }
 
     private func endRefreshTableReload() {
@@ -223,6 +250,17 @@ extension ChannelListViewController {
         for cookie in cookies {
             cookieStore.setCookie(cookie)
         }
+    }
+
+    // split view의 접힘 상태에 맞춰 카드형/목록형을 바꾼다. MainSplitViewController가 접힘·펼침 때도 부른다.
+    func updateLayoutStyle() {
+        // 시작할 때 split view가 접히면 목록 화면의 view가 아직 없을 수 있다. 그때는 viewDidLayoutSubviews에서 맞춘다.
+        guard isViewLoaded, subViews.superview != nil else { return }
+        let isCardStyle = isCollapsedLayout
+        guard subViews.isCardStyle != isCardStyle else { return }
+        subViews.updateLayout(isCardStyle: isCardStyle)
+        makeSubViewsConstraints(isCardStyle: isCardStyle)
+        subViews.collectionView.reloadData()
     }
 
     @objc private func loadWebView() {
@@ -307,10 +345,10 @@ extension ChannelListViewController: UICollectionViewDataSource {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ChannelListCell.identifier, for: indexPath) as! ChannelListCell
         if viewModel.viewMode == .search {
             guard viewModel.searchLists.count > indexPath.item else { return cell }
-            cell.updateUI(text: viewModel.searchLists[indexPath.item].name)
+            cell.updateUI(text: viewModel.searchLists[indexPath.item].name, isCardStyle: subViews.isCardStyle)
         } else {
             guard viewModel.listData.count > indexPath.item else { return cell }
-            cell.updateUI(text: viewModel.listData[indexPath.item].name)
+            cell.updateUI(text: viewModel.listData[indexPath.item].name, isCardStyle: subViews.isCardStyle)
         }
         return cell
     }
@@ -343,14 +381,30 @@ extension ChannelListViewController: UICollectionViewDelegate {
 
 extension ChannelListViewController: UICollectionViewDelegateFlowLayout {
     public func collectionView(_ collectionView: UICollectionView,layout collectionViewLayout: UICollectionViewLayout,sizeForItemAt indexPath: IndexPath) -> CGSize {
-        if CommonFunctions.isIOS {
-            // iPhone에서 목록은 화면 전체 폭이므로 UIScreen.main(iOS 26 deprecated) 대신 컬렉션 뷰 폭을 쓴다.
-            let boxSize = ((collectionView.bounds.width - (16*3)) / 2)
+        // 섹션 여백에 좌우 safe area를 더했으므로(insetForSectionAt) 폭도 safe area 안쪽으로 계산한다.
+        let safeAreaInsets = collectionView.safeAreaInsets
+        let availableWidth = collectionView.bounds.width - safeAreaInsets.left - safeAreaInsets.right
+        if subViews.isCardStyle {
+            // 기기 크기를 가정하지 않고 폭에 맞춰 열 수를 정한다. 일반 iPhone 세로 화면은 지금처럼 2열이다.
+            let spacing: CGFloat = 16
+            let minimumBoxWidth: CGFloat = 160
+            let columnCount = max(2, Int((availableWidth - spacing) / (minimumBoxWidth + spacing)))
+            let boxSize = floor((availableWidth - (spacing * CGFloat(columnCount + 1))) / CGFloat(columnCount))
+            guard boxSize > 0 else { return .zero }
             return CGSize.init(width: boxSize, height: boxSize/2)
         } else {
-            return CGSize.init(width: collectionView.bounds.width, height: 42)
+            return CGSize.init(width: max(availableWidth, 0), height: 42)
         }
+    }
 
+    // iOS 27.1 SDK의 iPhone Duo는 툴바가 화면 옆에 세로로 붙는다. 세로 스크롤 목록은 좌우 safe area가 contentInset에 들어가지 않으므로 직접 더한다.
+    public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
+        let baseInset = (collectionViewLayout as? UICollectionViewFlowLayout)?.sectionInset ?? .zero
+        let safeAreaInsets = collectionView.safeAreaInsets
+        return UIEdgeInsets(top: baseInset.top,
+                            left: baseInset.left + safeAreaInsets.left,
+                            bottom: baseInset.bottom,
+                            right: baseInset.right + safeAreaInsets.right)
     }
 }
 
@@ -366,7 +420,8 @@ extension ChannelListViewController: WKScriptMessageHandler {
                 // 추가 처리 로직 구현 가능
                 let titleName = viewModel.selectedChannel?.name ?? ""
                 let videoData = VideoPlayerModel(videoUrl: videoUrl, titleName: titleName)
-                if CommonFunctions.isIOS {
+                // 접힌 화면(한 칸)이면 push, 펼친 화면이면 MainSplitViewController가 상세 칼럼을 바꾼다.
+                if isCollapsedLayout {
                     let videoViewModel = VideoPlayerViewModel(item: videoData)
                     let videoPlayerVC = VideoPlayerViewController(viewModel: videoViewModel)
                     self.pushView(videoPlayerVC)
