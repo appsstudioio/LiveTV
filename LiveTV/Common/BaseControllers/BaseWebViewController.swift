@@ -97,14 +97,13 @@ class BaseWebViewController: BaseViewController {
                 $0.top.leading.trailing.equalToSuperview()
                 $0.bottom.equalTo(self.view.safeAreaLayoutGuide.snp.top)
             }
-            let leftButton = UIButton(type: .custom)
-            leftButton.setImage(UIImage(systemName: "xmark")?.withRenderingMode(.alwaysTemplate), for: .normal)
+            // iOS 26: 콘텐츠 위에 떠 있는 버튼이므로 흰 배경·그림자 대신 Liquid Glass 버튼 스타일을 쓴다.
+            var closeConfiguration = UIButton.Configuration.glass()
+            closeConfiguration.image = UIImage(systemName: "xmark")
+            closeConfiguration.contentInsets = .zero
+            let leftButton = UIButton(configuration: closeConfiguration)
             leftButton.addTarget(self, action: #selector(closeView), for: .touchUpInside)
             view.addSubview(leftButton)
-            leftButton.setBackgroundColor(.white, for: .normal)
-            leftButton.layer.cornerRadius = 32/2
-            leftButton.layer.masksToBounds = true
-            leftButton.layer.makeShadow()
 
             leftButton.snp.makeConstraints {
                 $0.top.equalTo(topSafeAreaView.snp.bottom).offset(12)
@@ -175,22 +174,23 @@ class BaseWebViewController: BaseViewController {
     }
 
     func setNavigationRightButton() {
-        let shareButton = UIBarButtonItem.createUIBarButtonItem(image: UIImage.getSFSymbolImage(name: "square.and.arrow.up", size: 16, weight: .regular, color: UIColor.named(.contentWhite)),
-                                                                 target: self,
-                                                                 action: #selector(shareFile))
+        // iOS 26: 흰색 아이콘의 customView는 투명한 Liquid Glass 바에서 보이지 않으므로 기본 바 버튼을 쓴다.
+        let shareButton = UIBarButtonItem(image: UIImage(systemName: "square.and.arrow.up"),
+                                          style: .plain,
+                                          target: self,
+                                          action: #selector(shareFile(_:)))
         self.navigationItem.rightBarButtonItems = [shareButton]
     }
 }
 
 extension BaseWebViewController {
 
-    @objc private func shareFile() {
-        DispatchQueue.main.async { [weak self] in
-            if let url = URL(string: self?.viewModel.urlString ?? "") {
-                self?.showActivityViewController(activityItems: [url],
-                                                sourceRect: self?.navigationItem.rightBarButtonItem?.customView?.frame ?? .zero)
-            }
-        }
+    @objc private func shareFile(_ sender: UIBarButtonItem) {
+        guard let url = URL(string: viewModel.urlString) else { return }
+        let activityVC = UIActivityViewController(activityItems: [url], applicationActivities: nil)
+        // 바 버튼을 출발점으로 지정해야 iPad 팝오버와 iOS 26 전환 애니메이션이 버튼에서 시작된다.
+        activityVC.popoverPresentationController?.sourceItem = sender
+        present(activityVC, animated: true)
     }
 
     @objc private func closeView() {

@@ -16,16 +16,12 @@ import GoogleCast
 
 final class VideoPlayerViewController: BaseViewController {
 
-    let backButton = UIButton().then {
-        $0.setImage(UIImage(systemName: "arrow.backward"), for: .normal)
-        $0.tintColor = .named(.contentPrimary)
-    }
+    // iOS 26: 고정 크기 customView 대신 기본 바 버튼을 써야 Liquid Glass 배경과 그룹 간격이 시스템 기준으로 적용된다.
+    let backButton = UIBarButtonItem(image: UIImage(systemName: "arrow.backward"), style: .plain, target: nil, action: nil)
 
-    let infoButton = UIButton().then {
-        $0.setImage(UIImage(systemName: "list.and.film"), for: .normal)
-        $0.tintColor = .named(.contentPrimary)
-    }
+    let infoButton = UIBarButtonItem(image: UIImage(systemName: "list.and.film"), style: .plain, target: nil, action: nil)
 
+    // Cast 버튼은 SDK가 연결 상태 아이콘을 직접 그리므로 customView로 둔다.
     let castButton = GCKUICastButton().then {
         $0.tintColor = .named(.contentPrimary)
     }
@@ -126,14 +122,14 @@ final class VideoPlayerViewController: BaseViewController {
     private func setupUI() {
         setNavigationBarTitle(viewModel.info.titleName)
         if CommonFunctions.isIOS {
-            hideNavigationLeftButton(hidden: false, button: backButton, buttonSize: CGSize(width: 24, height: 24))
+            navigationItem.hidesBackButton = true
+            navigationItem.leftBarButtonItem = backButton
         } else {
             hideNavigationLeftButton(hidden: true)
         }
 
-        let infoItem = UIBarButtonItem.buttonToBarButtonItem(infoButton)
-        let castItem = UIBarButtonItem.buttonToBarButtonItem(castButton)
-        navigationItem.rightBarButtonItems = [infoItem, castItem]
+        let castItem = UIBarButtonItem(customView: castButton)
+        navigationItem.rightBarButtonItems = [infoButton, castItem]
 
         guard let url = URL(string: viewModel.info.videoUrl) else {
             self.alertWith(message: "재생 가능한 동영상을 찾을 수 없습니다!") { _ in
@@ -163,7 +159,9 @@ final class VideoPlayerViewController: BaseViewController {
         self.addChild(playerViewController)
         self.view.addSubview(playerViewController.view)
         playerViewController.view.snp.makeConstraints {
-            $0.edges.equalToSuperview()
+            // iOS 26 네비게이션 바는 투명하므로, 플레이어의 검은 배경이 바 아래로 들어가면 타이틀이 보이지 않는다.
+            $0.top.equalTo(self.view.safeAreaLayoutGuide.snp.top)
+            $0.leading.trailing.bottom.equalToSuperview()
         }
         playerViewController.didMove(toParent: self)
         playerViewController.canStartPictureInPictureAutomaticallyFromInline = true

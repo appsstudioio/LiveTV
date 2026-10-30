@@ -17,6 +17,15 @@ final class ChannelListViewController: BaseViewController {
     let viewModel = ChannelListViewModel()
     var videoWebView: WKWebView? // 비디오 플레이어 웹뷰
 
+    // iOS 26: 검색 필드를 네비게이션 아이템에 두어야 시스템이 Liquid Glass를 적용한다.
+    // 위치는 시스템 기본값을 따른다(iPhone은 하단 툴바 영역). 상단에 두려면 navigationItem.preferredSearchBarPlacement = .stacked.
+    let searchController = UISearchController(searchResultsController: nil).then {
+        // 검색 결과를 같은 목록에 보여주므로 배경을 가리지 않는다. 검색어가 없을 때의 딤은 ChannelListView.dimView가 담당한다.
+        $0.obscuresBackgroundDuringPresentation = false
+        $0.searchBar.placeholder = "채널명을 입력하세요."
+        $0.searchBar.searchTextField.textContentType = .none
+    }
+
     override func loadView() {
         super.loadView()
     }
@@ -70,7 +79,7 @@ final class ChannelListViewController: BaseViewController {
             self.subViews.collectionView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: (keyboardHeight == 0 ? 60 : keyboardHeight), right: 0)
         }.store(in: &cancellables)
 
-        subViews.searchBarView.searchTextField.textPublisher.sink { [weak self] searchText in
+        searchController.searchBar.searchTextField.textPublisher.sink { [weak self] searchText in
             guard let self = self else { return }
             guard self.viewModel.viewMode == .search else { return }
             let keyword = searchText?.stringTrim ?? ""
@@ -155,14 +164,23 @@ final class ChannelListViewController: BaseViewController {
         hideNavigationLeftButton(hidden: true)
         setNavigationBarTitle("채널 목록")
 
+        searchController.delegate = self
+        searchController.searchBar.delegate = self
+        navigationItem.searchController = searchController
+        navigationItem.hidesSearchBarWhenScrolling = false
+        definesPresentationContext = true
+
         subViews.snp.makeConstraints {
+            // 상단은 safe area가 아닌 view에 맞춰 목록이 Liquid Glass 네비게이션 바 아래로 스크롤되게 한다.
+            $0.top.equalToSuperview()
             if CommonFunctions.isIOS {
-                $0.top.equalTo(self.view.safeAreaLayoutGuide.snp.top)
                 $0.leading.trailing.bottom.equalToSuperview()
             } else {
-                $0.edges.equalTo(self.view.safeAreaLayoutGuide)
+                $0.leading.trailing.bottom.equalTo(self.view.safeAreaLayoutGuide)
             }
         }
+        // 화면 뒤의 목록용 WKWebView도 스크롤 뷰를 가지므로, 바의 스크롤 엣지 효과가 따라갈 스크롤 뷰를 지정한다.
+        setContentScrollView(subViews.collectionView, for: .all)
 
         subViews.webView.navigationDelegate = self
         subViews.webView.uiDelegate = self
@@ -175,7 +193,6 @@ final class ChannelListViewController: BaseViewController {
             subViews.webView.isInspectable = true
         }
 #endif
-        subViews.searchBarView.delegate = self
         subViews.collectionView.delegate = self
         subViews.collectionView.dataSource = self
 
@@ -225,19 +242,21 @@ extension ChannelListViewController {
     }
 }
 
-// MARK: - UISearchBarDelegate
-extension ChannelListViewController: UISearchBarDelegate {
-    func searchBarShouldBeginEditing(_ searchBar: UISearchBar) -> Bool {
+// MARK: - UISearchControllerDelegate
+extension ChannelListViewController: UISearchControllerDelegate {
+    // 검색 시작·종료는 취소 버튼, 닫기 버튼, 바깥 탭 등 경로가 여러 개라 search controller 기준으로 처리한다.
+    func willPresentSearchController(_ searchController: UISearchController) {
         self.searchMode(viewMode: .search)
-        return true
     }
 
-    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-        self.closeKeyboard()
-        searchBar.text = ""
+    func willDismissSearchController(_ searchController: UISearchController) {
+        searchController.searchBar.text = ""
         self.searchMode(viewMode: .list)
     }
+}
 
+// MARK: - UISearchBarDelegate
+extension ChannelListViewController: UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         guard let keyword = searchBar.text?.stringTrim, keyword.count > 0 else {
             searchBar.layer.shakingAnimation()
@@ -252,22 +271,19 @@ extension ChannelListViewController: UISearchBarDelegate {
 
 extension ChannelListViewController: UIScrollViewDelegate {
 
+    // 네비게이션 바 숨김과 취소 버튼 표시는 UISearchController가 처리한다.
     func searchMode(viewMode: ChannelListViewMode) {
-        UIBarButtonItem.appearance(whenContainedInInstancesOf: [UISearchBar.self]).setTitleTextAttributes([.foregroundColor: UIColor.named(.mainColor)], for: .normal)
-
         UIView.animate(withDuration: 0.5) { [weak self] in
             guard let self = self else { return }
             self.subViews.isShowDim = (viewMode == .search)
             self.viewModel.changeViewMode(viewMode: viewMode)
-            self.hideNavigationBar(hidden: (viewMode == .search), animate: true)
             self.viewModel.state.updateUI.send()
-            self.subViews.searchBarView.showsCancelButton = (viewMode == .search)
         }
     }
 
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let translation = scrollView.panGestureRecognizer.translation(in: scrollView.superview)
-        if translation.y > 0 && subViews.searchBarView.isFirstResponder {
+        if translation.y > 0 && searchController.searchBar.searchTextField.isFirstResponder {
             self.closeKeyboard()
         }
     }
@@ -311,8 +327,8 @@ extension ChannelListViewController: UICollectionViewDelegate {
             selectChannel = viewModel.searchLists[indexPath.item]
             script = viewModel.searchLists[indexPath.item].link
             // 리스트 모드로 변경..
-            subViews.searchBarView.text = ""
-            closeKeyboard()
+            searchController.searchBar.text = ""
+            searchController.isActive = false
             searchMode(viewMode: .list)
         } else {
             guard viewModel.listData.count > indexPath.item else { return }

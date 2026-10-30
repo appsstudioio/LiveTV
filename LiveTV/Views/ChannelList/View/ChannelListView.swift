@@ -14,13 +14,6 @@ final class ChannelListView: UIView {
 
     var webView: WKWebView!
 
-    let searchBarView = UISearchBar().then {
-        $0.backgroundColor = UIColor.named(.backgroundColor)
-        $0.layer.borderWidth = 0
-        $0.layer.borderColor = UIColor.clear.cgColor
-        $0.backgroundImage = nil
-    }
-
     var refreshControl = UIRefreshControl()
 
     let collectionView = UICollectionView(frame:CGRect.zero, collectionViewLayout: UICollectionViewLayout()).then {
@@ -66,17 +59,6 @@ final class ChannelListView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
 
-    override func layoutSubviews() {
-        super.layoutSubviews()
-
-        if let textField = searchBarView.value(forKey: "searchField") as? UITextField {
-            textField.layer.borderWidth = 1
-            textField.layer.cornerRadius = 8
-            textField.layer.borderColor = UIColor.named(.borderOpaque).cgColor
-            textField.attributedPlaceholder = "채널명을 입력하세요.".toAttributed(fontType: .r17px, lineHeight: 0, color: UIColor.named(.contentPlaceHolder))
-        }
-    }
-
     // MARK: - functions
     private func setupUI() {
         backgroundColor = UIColor.named(.backgroundColor)
@@ -90,7 +72,7 @@ final class ChannelListView: UIView {
         // 커스텀 User-Agent 설정 (모바일 에이전트로 고정)
         webView.customUserAgent = "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1"
 
-        [webView, searchBarView, collectionView, dimView].forEach {
+        [webView, collectionView, dimView].forEach {
             addSubview($0)
         }
 
@@ -98,34 +80,17 @@ final class ChannelListView: UIView {
             $0.edges.equalToSuperview()
         }
 
-        searchBarView.snp.makeConstraints {
-            $0.top.equalToSuperview()
-            $0.leading.trailing.equalToSuperview()
-            $0.height.equalTo(54)
-        }
-
+        // 검색 바는 ChannelListViewController의 navigationItem.searchController가 담당한다.
+        // 목록은 Liquid Glass 바 아래까지 스크롤되도록 상단을 뷰 끝에 맞추고, 바 높이만큼의 여백은 contentInsetAdjustmentBehavior가 계산한다.
         collectionView.snp.makeConstraints {
-            $0.top.equalTo(searchBarView.snp.bottom)
-            $0.bottom.leading.trailing.equalToSuperview()
+            $0.edges.equalToSuperview()
         }
 
         dimView.snp.makeConstraints {
             $0.edges.equalTo(collectionView.snp.edges)
         }
 
-        if let textField = searchBarView.value(forKey: "searchField") as? UITextField {
-            textField.backgroundColor = UIColor.named(.backgroundColor)
-            textField.textColor = UIColor.named(.contentPrimary)
-            textField.textContentType = .none
-            //왼쪽 아이콘 이미지넣기
-            if let leftView = textField.leftView as? UIImageView {
-                leftView.image = leftView.image?.withRenderingMode(.alwaysTemplate)
-                //이미지 틴트컬러 정하기
-                leftView.tintColor = UIColor.named(.contentSecondary)
-            }
-        }
-
-        collectionView.addSubview(refreshControl)
+        collectionView.refreshControl = refreshControl
         let pagerCollectionViewLayout = UICollectionViewFlowLayout()
         if CommonFunctions.isIOS {
             pagerCollectionViewLayout.minimumInteritemSpacing = 16
