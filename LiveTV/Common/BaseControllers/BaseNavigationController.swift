@@ -45,6 +45,11 @@ class BaseNavigationController: UINavigationController {
         interactivePopGestureRecognizer?.delegate = nil
     }
 
+    // 상태 바 글자색은 맨 위 화면이 정한다(재생 화면은 영상 위라 밝은 글자).
+    override var childForStatusBarStyle: UIViewController? {
+        return topViewController
+    }
+
     private func setNavigation(){
         self.navigationBar.setDefaultNavigationBarStyle()
     }

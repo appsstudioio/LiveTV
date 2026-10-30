@@ -70,6 +70,12 @@ final class MainSplitViewController: UISplitViewController {
         set { super.hidesBottomBarWhenPushed = newValue }
     }
 
+    // 접힌 화면은 한 칸뿐이라 맨 위 화면(목록 또는 재생)이 상태 바 글자색을 정한다.
+    // 펼친 화면은 상태 바가 목록과 영상 중 어디에 걸치는지 기기마다 달라 시스템 기본값을 쓴다.
+    override var childForStatusBarStyle: UIViewController? {
+        return isCollapsed ? viewController(for: .primary) : nil
+    }
+
     // MARK: - functions
     private func setBinding() {
         NotificationCenter.default
@@ -158,17 +164,24 @@ extension MainSplitViewController: UISplitViewControllerDelegate {
     // iPhone Duo를 접었을 때: 상세에서 보던 채널을 목록 위에 push해서 이어서 보여 준다.
     func splitViewControllerDidCollapse(_ svc: UISplitViewController) {
         channelListVC.updateLayoutStyle()
-        guard let item = detailVideoPlayer?.viewModel.info else { return }
-        // 기존 재생 화면을 먼저 떼어 내야 viewDidDisappear의 오디오 세션 비활성화가 새 화면의 활성화보다 먼저 큐에 들어간다.
-        setEmptyDetailViewController()
-        DispatchQueue.main.async { [weak self] in
-            self?.pushVideoPlayer(with: item)
+        setNeedsStatusBarAppearanceUpdate()
+        guard let detailVideoPlayer = detailVideoPlayer else { return }
+        let item = detailVideoPlayer.viewModel.info
+        // 전체 화면 모달이 떠 있으면 먼저 닫아야 옮긴 뒤 같은 채널이 두 번 재생되지 않는다.
+        detailVideoPlayer.dismissFullScreenPlayer { [weak self] in
+            guard let self = self else { return }
+            // 기존 재생 화면을 먼저 떼어 내야 viewDidDisappear의 오디오 세션 비활성화가 새 화면의 활성화보다 먼저 큐에 들어간다.
+            self.setEmptyDetailViewController()
+            DispatchQueue.main.async { [weak self] in
+                self?.pushVideoPlayer(with: item)
+            }
         }
     }
 
     // iPhone Duo를 펼쳤을 때: 목록 위에 push되어 있던 재생 화면을 상세 칼럼으로 옮긴다.
     func splitViewControllerDidExpand(_ svc: UISplitViewController) {
         channelListVC.updateLayoutStyle()
+        setNeedsStatusBarAppearanceUpdate()
         guard let listNVC = viewController(for: .primary) as? UINavigationController,
               let videoPlayerVC = listNVC.viewControllers.last(where: { $0 is VideoPlayerViewController }) as? VideoPlayerViewController else {
             // 접힌 동안 재생 화면을 닫았다면, 펼친 뒤 예전 채널이 남지 않도록 빈 화면으로 되돌린다.
@@ -178,9 +191,12 @@ extension MainSplitViewController: UISplitViewControllerDelegate {
             return
         }
         let item = videoPlayerVC.viewModel.info
-        listNVC.popToRootViewController(animated: false)
-        DispatchQueue.main.async { [weak self] in
-            self?.updateDetailViewController(with: item)
+        // 전체 화면 모달이 떠 있으면 먼저 닫아야 옮긴 뒤 같은 채널이 두 번 재생되지 않는다.
+        videoPlayerVC.dismissFullScreenPlayer { [weak self] in
+            listNVC.popToRootViewController(animated: false)
+            DispatchQueue.main.async {
+                self?.updateDetailViewController(with: item)
+            }
         }
     }
 }

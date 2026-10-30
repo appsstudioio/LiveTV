@@ -21,6 +21,13 @@ final class VideoPlayerViewController: BaseViewController {
 
     let infoButton = UIBarButtonItem(image: UIImage(systemName: "list.and.film"), style: .plain, target: nil, action: nil)
 
+    let fullScreenButton = UIBarButtonItem(image: UIImage(systemName: "arrow.up.left.and.arrow.down.right"), style: .plain, target: nil, action: nil).then {
+        $0.accessibilityLabel = "전체 화면"
+    }
+
+    // 전체 화면은 AVPlayerViewController를 전체 화면 모달로 띄우는 시스템 방식으로 보여 준다(닫기·회전·PiP를 시스템이 처리).
+    private var fullScreenPlayerViewController: AVPlayerViewController?
+
     // Cast 버튼은 SDK가 연결 상태 아이콘을 직접 그리므로 customView로 둔다.
     let castButton = GCKUICastButton().then {
         $0.tintColor = .named(.contentPrimary)
@@ -61,6 +68,8 @@ final class VideoPlayerViewController: BaseViewController {
     
     override func viewIsAppearing(_ animated: Bool) {
         super.viewIsAppearing(animated)
+        // 전체 화면 모달을 닫고 돌아오면 플레이어를 다시 화면 안에 붙인다.
+        restoreInlinePlayerIfNeeded()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -73,8 +82,15 @@ final class VideoPlayerViewController: BaseViewController {
 
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
+        // 전체 화면 모달이 이 화면을 덮은 경우에는 재생을 이어 간다.
+        guard presentedViewController == nil else { return }
         videoPause()
         setAudioSessionActive(false)
+    }
+
+    // 영상 위 투명한 바 아래에서 상태 바 글자가 보이도록 밝은 글자를 쓴다(BaseNavigationController가 이 값을 따른다).
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return .lightContent
     }
 
     override var hidesBottomBarWhenPushed: Bool {
@@ -115,6 +131,10 @@ final class VideoPlayerViewController: BaseViewController {
             self.showSafariView(urlString: self.viewModel.getTimeTableUrlLink())
         }.store(in: &cancellables)
 
+        fullScreenButton.tapPublisher.sink { [weak self] in
+            self?.showFullScreenPlayer()
+        }.store(in: &cancellables)
+
         // 이미 연결된 상태에서 누르면 현재 채널을 다시 보낸다. 연결 전에는 SDK가 기기 선택 창을 띄우고,
         // 연결이 끝나면 sessionManager(_:didStart:)에서 전송한다.
         castButton.tapPublisher.sink { [weak self] in
@@ -141,7 +161,8 @@ final class VideoPlayerViewController: BaseViewController {
         }
 
         let castItem = UIBarButtonItem(customView: castButton)
-        navigationItem.rightBarButtonItems = [infoButton, castItem]
+        navigationItem.rightBarButtonItems = [infoButton, castItem, fullScreenButton]
+        setTransparentNavigationBar()
 
         guard let url = URL(string: viewModel.info.videoUrl) else {
             self.alertWith(message: "재생 가능한 동영상을 찾을 수 없습니다!") { _ in
@@ -171,9 +192,12 @@ final class VideoPlayerViewController: BaseViewController {
         self.addChild(playerViewController)
         self.view.addSubview(playerViewController.view)
         playerViewController.view.snp.makeConstraints {
-            // iOS 26 네비게이션 바는 투명하므로, 플레이어의 검은 배경이 바 아래로 들어가면 타이틀이 보이지 않는다.
-            $0.top.equalTo(self.view.safeAreaLayoutGuide.snp.top)
-            $0.leading.trailing.bottom.equalToSuperview()
+            // 위아래는 영상이 투명한 네비게이션 바 아래까지 보이도록 화면 끝에 맞춘다.
+            // 타이틀은 setTransparentNavigationBar()에서 흰색으로 바꾸고, 재생 컨트롤은 AVPlayerViewController가 safe area 안에 둔다.
+            $0.top.bottom.equalToSuperview()
+            // 좌우는 safe area에 맞춘다. iOS 26 split view는 상세 칼럼을 목록 칼럼 밑까지 깔고 그만큼을 safe area로 비워 두므로,
+            // 화면 끝에 맞추면 영상 왼쪽이 목록에 가려진다. 목록을 숨기면 safe area가 줄어 영상이 자동으로 넓어진다.
+            $0.leading.trailing.equalTo(self.view.safeAreaLayoutGuide)
         }
         playerViewController.didMove(toParent: self)
         playerViewController.canStartPictureInPictureAutomaticallyFromInline = true
@@ -190,6 +214,56 @@ extension VideoPlayerViewController {
 
     private func videoPause() {
         player.pause()
+    }
+
+    // 이 화면이 맨 위일 때만 쓰이는 바 모양이라 목록 화면의 바에는 영향을 주지 않는다.
+    // 배경색 지정이 아니라 투명 배경이므로 바 버튼의 Liquid Glass는 그대로 그려진다.
+    private func setTransparentNavigationBar() {
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithTransparentBackground()
+        appearance.titleTextAttributes = [
+            .foregroundColor: UIColor.named(.contentWhite),
+            .font: ComponentFont.sb18px.font
+        ]
+        navigationItem.standardAppearance = appearance
+        navigationItem.compactAppearance = appearance
+        navigationItem.scrollEdgeAppearance = appearance
+        navigationItem.compactScrollEdgeAppearance = appearance
+    }
+
+    private func showFullScreenPlayer() {
+        guard let player = player, let playerViewController = playerViewController, presentedViewController == nil else { return }
+        let fullScreenPlayerVC = AVPlayerViewController()
+        // 같은 AVPlayer를 두 화면에 동시에 붙이지 않도록 화면 안 플레이어에서 떼고 전체 화면에 붙인다.
+        playerViewController.player = nil
+        fullScreenPlayerVC.player = player
+        fullScreenPlayerVC.updatesNowPlayingInfoCenter = true
+        fullScreenPlayerVC.modalPresentationStyle = .fullScreen
+        fullScreenPlayerViewController = fullScreenPlayerVC
+        present(fullScreenPlayerVC, animated: true) {
+            player.play()
+        }
+    }
+
+    private func restoreInlinePlayerIfNeeded() {
+        guard let fullScreenPlayerVC = fullScreenPlayerViewController,
+              presentedViewController !== fullScreenPlayerVC else { return }
+        fullScreenPlayerVC.player = nil
+        playerViewController?.player = player
+        fullScreenPlayerViewController = nil
+    }
+
+    // 전체 화면 모달을 바로 닫는다. iPhone Duo를 접거나 펴서 재생 화면을 옮기기 전에 MainSplitViewController가 부른다.
+    func dismissFullScreenPlayer(completion: @escaping () -> Void) {
+        guard let fullScreenPlayerVC = fullScreenPlayerViewController,
+              fullScreenPlayerVC.presentingViewController != nil else {
+            completion()
+            return
+        }
+        fullScreenPlayerVC.dismiss(animated: false) { [weak self] in
+            self?.restoreInlinePlayerIfNeeded()
+            completion()
+        }
     }
 }
 
