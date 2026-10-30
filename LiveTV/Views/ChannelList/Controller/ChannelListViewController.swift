@@ -344,7 +344,8 @@ extension ChannelListViewController: UICollectionViewDelegate {
 extension ChannelListViewController: UICollectionViewDelegateFlowLayout {
     public func collectionView(_ collectionView: UICollectionView,layout collectionViewLayout: UICollectionViewLayout,sizeForItemAt indexPath: IndexPath) -> CGSize {
         if CommonFunctions.isIOS {
-            let boxSize = ((UIScreen.main.bounds.width - (16*3)) / 2)
+            // iPhone에서 목록은 화면 전체 폭이므로 UIScreen.main(iOS 26 deprecated) 대신 컬렉션 뷰 폭을 쓴다.
+            let boxSize = ((collectionView.bounds.width - (16*3)) / 2)
             return CGSize.init(width: boxSize, height: boxSize/2)
         } else {
             return CGSize.init(width: collectionView.bounds.width, height: 42)

@@ -98,10 +98,12 @@ extension UIViewController {
 
     @available(iOS 14.0, *)
     func showMutiSelectionPhotoView(selectionLimit: Int, filter: [PHPickerFilter]?) {
-        CommonUtils.photoLibraryPermissionCheck(isReadFlag: true) { isAccess, status in
+        // 바깥 클로저에서 weak로 캡처해야 안쪽 클로저까지 강한 참조가 생기지 않는다.
+        CommonUtils.photoLibraryPermissionCheck(isReadFlag: true) { [weak self] isAccess, status in
             switch status {
             case .authorized, .limited:
-                DispatchQueue.main.async { [weak self] in
+                DispatchQueue.main.async {
+                    guard let self = self else { return }
                     var configuration = PHPickerConfiguration(photoLibrary: PHPhotoLibrary.shared())
                     configuration.selectionLimit = selectionLimit
                     if let filter = filter {
@@ -110,10 +112,10 @@ extension UIViewController {
                     let picker = PHPickerViewController(configuration: configuration)
                     picker.delegate = (self as? PHPickerViewControllerDelegate)
                     picker.modalPresentationStyle = .overFullScreen
-                    self?.present(picker, animated: true)
+                    self.present(picker, animated: true)
                 }
             default:
-                self.alertWith(message: "사진 접근 권한을 설정하세요.")
+                self?.alertWith(message: "사진 접근 권한을 설정하세요.")
                 break
             }
         }

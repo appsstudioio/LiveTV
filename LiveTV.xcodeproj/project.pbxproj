@@ -228,6 +228,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				LM_FORCE_LINK_GENERATION = YES;
 				MARKETING_VERSION = "$(inherited)";
 				PRODUCT_BUNDLE_IDENTIFIER = "$(inherited)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -266,6 +267,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				LM_FORCE_LINK_GENERATION = YES;
 				MARKETING_VERSION = "$(inherited)";
 				PRODUCT_BUNDLE_IDENTIFIER = "$(inherited)";
 				PRODUCT_NAME = "$(TARGET_NAME)";

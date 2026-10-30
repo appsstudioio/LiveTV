@@ -45,6 +45,8 @@ final class MainSplitViewController: UISplitViewController {
     
     override func viewIsAppearing(_ animated: Bool) {
         super.viewIsAppearing(animated)
+        // 창에 붙은 뒤라 view 크기가 확정되어 있으므로 여기서 칼럼 폭을 계산한다.
+        setPrimaryColumnWidth()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -62,10 +64,6 @@ final class MainSplitViewController: UISplitViewController {
     override var hidesBottomBarWhenPushed: Bool {
         get { return true }
         set { super.hidesBottomBarWhenPushed = newValue }
-    }
-
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
     }
 
     // MARK: - functions
@@ -89,14 +87,21 @@ final class MainSplitViewController: UISplitViewController {
         self.setViewController(listNaviNVC, for: .primary)
         self.setViewController(emptyDetailNVC, for: .secondary)
 
-        let safeAreaInsets = UIApplication.shared.safeAreaInsets
-        let totalSafeAreaWidth = safeAreaInsets.left + safeAreaInsets.right
         preferredPrimaryColumnWidthFraction = 0.2
-        minimumPrimaryColumnWidth = (0.2 * (UIScreen.main.bounds.size.width - totalSafeAreaWidth))
-        maximumPrimaryColumnWidth = (0.2 * (UIScreen.main.bounds.size.width - totalSafeAreaWidth))
 
         self.preferredDisplayMode = .twoBesideSecondary
         self.delegate = self
+    }
+
+    // 목록 칼럼을 전체 폭의 20%로 고정한다. 기본 최소 폭보다 좁게 쓰려고 최소·최대 폭을 같은 값으로 둔다.
+    // UIScreen.main(iOS 26 deprecated) 대신 창에 붙은 split view의 폭을 기준으로 한다.
+    private func setPrimaryColumnWidth() {
+        let safeAreaInsets = UIApplication.shared.safeAreaInsets
+        let totalSafeAreaWidth = safeAreaInsets.left + safeAreaInsets.right
+        let columnWidth = (0.2 * (view.bounds.width - totalSafeAreaWidth))
+        guard columnWidth > 0 else { return }
+        minimumPrimaryColumnWidth = columnWidth
+        maximumPrimaryColumnWidth = columnWidth
     }
 }
 
