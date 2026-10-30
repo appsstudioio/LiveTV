@@ -192,14 +192,27 @@ extension VideoPlayerViewController: GCKRequestDelegate {
         }
 
         let mediaInfoBuilder = GCKMediaInformationBuilder.init(contentURL: mediaURL)
-        mediaInfoBuilder.streamType = GCKMediaStreamType.live;
+        mediaInfoBuilder.streamType = GCKMediaStreamType.live
         mediaInfoBuilder.contentType = "video/mp4"
-        mediaInfoBuilder.metadata = mediaMetadata;
-        let mediaInfo = mediaInfoBuilder.build()
+        mediaInfoBuilder.metadata = mediaMetadata
 
-        if let request = GCKCastContext.sharedInstance().sessionManager.currentSession?.remoteMediaClient?.loadMedia(mediaInfo) {
-          request.delegate = self
+        // Cast SDK 권장 방식: loadMedia(_:) 대신 load request data로 요청한다.
+        let loadRequestBuilder = GCKMediaLoadRequestDataBuilder()
+        loadRequestBuilder.mediaInformation = mediaInfoBuilder.build()
+        loadRequestBuilder.autoplay = true
+
+        if let request = GCKCastContext.sharedInstance().sessionManager.currentSession?.remoteMediaClient?.loadMedia(with: loadRequestBuilder.build()) {
+            request.delegate = self
         }
+    }
+
+    func request(_ request: GCKRequest, didFailWithError error: GCKError) {
+        // Cast SDK 4.8.4+: 사용자가 Cast 이용약관을 거부하면 cancelled로 끝난다. Google 안내에 따라 자동 재시도하지 않는다.
+        if error.code == GCKErrorCode.cancelled.rawValue {
+            DLog("Cast 요청 취소 :: \(error.localizedDescription)")
+            return
+        }
+        DLog("Cast 미디어 로드 실패 :: \(error)", level: .error)
     }
 
     func sessionManager(_ sessionManager: GCKSessionManager, didStart session: GCKSession) {
