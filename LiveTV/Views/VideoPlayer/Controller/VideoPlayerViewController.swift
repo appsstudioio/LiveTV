@@ -39,6 +39,10 @@ final class VideoPlayerViewController: BaseViewController {
         fatalError("init(coder:) has not been implemented")
     }
 
+    deinit {
+        GCKCastContext.sharedInstance().sessionManager.remove(self)
+    }
+
     override func loadView() {
         super.loadView()
     }
@@ -111,10 +115,15 @@ final class VideoPlayerViewController: BaseViewController {
             self.showSafariView(urlString: self.viewModel.getTimeTableUrlLink())
         }.store(in: &cancellables)
 
+        // 이미 연결된 상태에서 누르면 현재 채널을 다시 보낸다. 연결 전에는 SDK가 기기 선택 창을 띄우고,
+        // 연결이 끝나면 sessionManager(_:didStart:)에서 전송한다.
         castButton.tapPublisher.sink { [weak self] in
             guard let self = self else { return }
             self.castMedia(url: self.viewModel.info.videoUrl, title: self.viewModel.info.titleName)
         }.store(in: &cancellables)
+
+        // 리스너는 SDK가 약하게 보유하므로 deinit에서 해제한다.
+        GCKCastContext.sharedInstance().sessionManager.add(self)
 
         videoPlay()
     }
@@ -214,9 +223,21 @@ extension VideoPlayerViewController: GCKRequestDelegate {
         }
         DLog("Cast 미디어 로드 실패 :: \(error)", level: .error)
     }
+}
 
+// MARK: - GCKSessionManagerListener
+extension VideoPlayerViewController: GCKSessionManagerListener {
+    // 기기 선택 창에서 연결이 끝나면 보고 있던 채널을 바로 보낸다.
+    // TV와 기기에서 소리가 겹치지 않도록 기기 재생은 멈춘다.
     func sessionManager(_ sessionManager: GCKSessionManager, didStart session: GCKSession) {
         DLog("Cast session started")
+        videoPause()
+        castMedia(url: viewModel.info.videoUrl, title: viewModel.info.titleName)
+    }
+
+    func sessionManager(_ sessionManager: GCKSessionManager, didFailToStart session: GCKSession, withError error: Error) {
+        // 이용약관 거부(cancelled)를 포함해 연결 실패 시 자동 재시도하지 않는다.
+        DLog("Cast session 연결 실패 :: \(error)", level: .error)
     }
 
     func sessionManager(_ sessionManager: GCKSessionManager, didEnd session: GCKSession, withError error: Error?) {
