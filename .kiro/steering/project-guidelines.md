@@ -50,7 +50,7 @@ LiveTV/
 └── Views/
     ├── ChannelList/             # 채널 목록. 검색은 Controller의 navigationItem.searchController. Controller / Model / View / ViewModel
     ├── VideoPlayer/             # 영상 재생(AVPlayer, Cast). Controller / Model / ViewModel
-    ├── MainSplit/               # 앱 루트 UISplitViewController (펼침: 목록 | 상세, 접힘: 목록 → push). 접힘·펼침 때 재생 화면을 옮긴다
+    ├── MainSplit/               # 앱 루트 UISplitViewController (펼침: 목록 | 상세, 접힘: 목록 → push). 접힘·펼침 때 재생 화면을 옮긴다. 목록 칼럼 폭은 20%, 최소 280pt(검색 플레이스홀더가 잘리지 않게), 최대 40%
     ├── Empty/                   # 펼친 화면 상세 영역의 "채널을 선택하세요" 화면
     └── CommonViews/             # 재사용 뷰 (ToastView)
 ```

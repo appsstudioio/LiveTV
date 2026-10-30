@@ -97,12 +97,16 @@ final class MainSplitViewController: UISplitViewController {
         self.delegate = self
     }
 
-    // 목록 칼럼을 전체 폭의 20%로 고정한다. 기본 최소 폭보다 좁게 쓰려고 최소·최대 폭을 같은 값으로 둔다.
+    // 목록 칼럼은 전체 폭의 20%로 하되, 하단 검색 필드의 플레이스홀더("채널명을 입력하세요.")가 잘리지 않도록 최소 폭을 둔다.
+    // iPhone Duo 안쪽 화면처럼 폭이 좁은 경우에도 상세(영상) 칼럼이 너무 줄지 않도록 최대 40%로 제한한다.
+    // 최소·최대 폭을 같은 값으로 두어 시스템 기본 폭 대신 이 값으로 고정한다.
     // 앱 창이 화면 전체와 같지 않을 수 있으므로(iPhone Duo, 멀티태스킹) 앱 전체가 아닌 split view 자신의 폭과 safe area를 쓴다.
     private func setPrimaryColumnWidth() {
         let safeAreaInsets = view.safeAreaInsets
         let totalSafeAreaWidth = safeAreaInsets.left + safeAreaInsets.right
-        let columnWidth = (0.2 * (view.bounds.width - totalSafeAreaWidth))
+        let availableWidth = view.bounds.width - totalSafeAreaWidth
+        let minimumColumnWidth: CGFloat = 280
+        let columnWidth = floor(min(max(0.2 * availableWidth, minimumColumnWidth), 0.4 * availableWidth))
         guard columnWidth > 0 else { return }
         // 값을 바꾸면 레이아웃이 다시 돌므로 같은 값이면 건너뛴다.
         guard minimumPrimaryColumnWidth != columnWidth || maximumPrimaryColumnWidth != columnWidth else { return }
