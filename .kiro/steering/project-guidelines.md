@@ -114,7 +114,7 @@ README.md                        # 프로젝트 소개·빌드·브랜치/릴리
 | `APPSTORE_ID` | 6473762430 | 1352848474 |
 | App Group | `group.io.appstudio.LiveTV.dev` | `group.io.appstudio.LiveTV` |
 
-- Bundle ID(`io.appstudio.LiveTV`), `MARKETING_VERSION`(현재 1.0.5), `CURRENT_PROJECT_VERSION`은 두 xcconfig에 각각 있다. **버전을 올릴 때는 두 파일을 같이 수정한다.**
+- Bundle ID(`io.appstudio.LiveTV`), `MARKETING_VERSION`(현재 1.1.0), `CURRENT_PROJECT_VERSION`은 두 xcconfig에 각각 있다. **버전을 올릴 때는 두 파일을 같이 수정한다.** 타깃 빌드 설정(`project.pbxproj`)의 `MARKETING_VERSION`은 `$(inherited)`로 두어 xcconfig 값을 따르게 한다(Xcode General 탭에서 버전을 고치면 타깃 값이 덮어써지므로 xcconfig에서 고친다).
 - 앱 타깃에는 `LM_FORCE_LINK_GENERATION = YES`가 있다. App Intents를 쓰지 않는 앱에서 나는 `Metadata extraction skipped, no AppIntents.framework dependency found` 워닝을 없애려는 설정이다(Swift 패키지 타깃과 같은 방식). App Intents를 도입해도 그대로 둬도 된다.
 - iOS 26 타깃에서 deprecated 워닝이 나지 않도록 `UIScreen.main` 대신 `view.bounds`나 `view.window?.windowScene?.screen`을, `traitCollectionDidChange` 대신 `registerForTraitChanges`를 쓴다.
 - 환경별 값(호스트, Firebase 파일명, 스토어 ID 등)은 xcconfig 키로 추가하고 `Info.plist`에 `$(KEY)`로 노출한 뒤 `Bundle.getInfoPlistValue(forKey:)`로 읽는다. 코드에 하드코딩하지 않는다.
