@@ -11,6 +11,10 @@ import AVFoundation
 import PhotosUI
 import MessageUI
 
+// AVAudioSession의 카테고리 설정과 활성화는 동기(블로킹) 호출이라 메인 스레드에서 부르면 UI가 멈출 수 있다.
+// 호출 순서(활성화 → 비활성화)를 지키기 위해 전용 직렬 큐에서 처리한다.
+private let audioSessionQueue = DispatchQueue(label: "io.appstudio.LiveTV.audioSession", qos: .userInitiated)
+
 // MARK: - SFSafariViewControllerDelegate
 extension BaseViewController: SFSafariViewControllerDelegate {
 
@@ -57,11 +61,10 @@ extension BaseViewController {
             handler(nil)
         }))
 
-        if (UIDevice().userInterfaceIdiom == UIUserInterfaceIdiom.pad) {
-            actionSheet.popoverPresentationController?.sourceView = view
-            actionSheet.popoverPresentationController?.sourceRect = view.frame
-            actionSheet.popoverPresentationController?.permittedArrowDirections = []
-        }
+        // 넓은 화면(iPad, 펼친 iPhone Duo)에서는 액션 시트가 팝오버로 바뀌므로 기기 종류와 관계없이 기준 뷰를 지정한다.
+        actionSheet.popoverPresentationController?.sourceView = view
+        actionSheet.popoverPresentationController?.sourceRect = view.frame
+        actionSheet.popoverPresentationController?.permittedArrowDirections = []
 
         self.present(actionSheet, animated: true, completion: nil)
     }
@@ -81,22 +84,32 @@ extension BaseViewController {
             handler(nil)
         }))
 
-        if (UIDevice().userInterfaceIdiom == UIUserInterfaceIdiom.pad) {
-            actionSheet.popoverPresentationController?.sourceView = view
-            actionSheet.popoverPresentationController?.sourceRect = view.frame
-            actionSheet.popoverPresentationController?.permittedArrowDirections = []
-        }
+        // 넓은 화면(iPad, 펼친 iPhone Duo)에서는 액션 시트가 팝오버로 바뀌므로 기기 종류와 관계없이 기준 뷰를 지정한다.
+        actionSheet.popoverPresentationController?.sourceView = view
+        actionSheet.popoverPresentationController?.sourceRect = view.frame
+        actionSheet.popoverPresentationController?.permittedArrowDirections = []
 
         self.present(actionSheet, animated: true, completion: nil)
     }
 
     func setAudioSessionActive(_ isActive: Bool, category: AVAudioSession.Category = .playback) {
-        DispatchQueue.main.async {
-            try? AVAudioSession.sharedInstance().setCategory(category, mode: .moviePlayback, options: [.allowBluetooth, .allowAirPlay, .allowBluetoothA2DP])
-            if category == .playAndRecord || category == .record {
-                try? AVAudioSession.sharedInstance().setActive(isActive, options: .notifyOthersOnDeactivation)
-            } else {
-                try? AVAudioSession.sharedInstance().setActive(isActive)
+        audioSessionQueue.async {
+            let session = AVAudioSession.sharedInstance()
+            // 기존 동작처럼 카테고리 설정이 실패해도 활성화는 시도한다.
+            do {
+                try session.setCategory(category, mode: .moviePlayback, options: [AVAudioSession.CategoryOptions.allowBluetoothHFP, .allowAirPlay, .allowBluetoothA2DP])
+            } catch {
+                DLog("AVAudioSession 카테고리 설정 실패 :: \(error)", level: .error)
+            }
+
+            do {
+                if category == .playAndRecord || category == .record {
+                    try session.setActive(isActive, options: .notifyOthersOnDeactivation)
+                } else {
+                    try session.setActive(isActive)
+                }
+            } catch {
+                DLog("AVAudioSession \(isActive ? "활성화" : "비활성화") 실패 :: \(error)", level: .error)
             }
         }
     }

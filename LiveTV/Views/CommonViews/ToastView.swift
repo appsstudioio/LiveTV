@@ -165,14 +165,15 @@ class ToastView {
                 }
 
                 container.snp.makeConstraints {
-                    $0.left.right.equalToSuperview().inset(20)
+                    $0.left.right.equalTo(mainWindow.safeAreaLayoutGuide).inset(20)
+                    // 앱 전체 값이 아니라 토스트를 붙이는 창의 safe area를 쓴다(iPhone Duo는 접고 펼 때 창과 바 위치가 바뀐다).
                     switch option.position {
                     case .top:
-                        $0.top.equalToSuperview().inset(16 + UIApplication.shared.safeAreaInsets.top)
+                        $0.top.equalTo(mainWindow.safeAreaLayoutGuide.snp.top).offset(16)
                     case .center:
                         $0.centerY.equalToSuperview()
                     case .bottom:
-                        $0.bottom.equalToSuperview().inset(16 + UIApplication.shared.safeAreaInsets.bottom)
+                        $0.bottom.equalTo(mainWindow.safeAreaLayoutGuide.snp.bottom).offset(-16)
                     }
                 }
                 mainWindow.bringSubviewToFront(container)

@@ -20,12 +20,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         sleep(1)
         window = UIWindow(windowScene: windowScene)
-        if CommonFunctions.isIOS {
-            window?.rootViewController = BaseNavigationController(rootViewController: ChannelListViewController())
-        } else {
-           let mainSplitVC = MainSplitViewController(style: .doubleColumn)
-            window?.rootViewController = mainSplitVC
-        }
+        // iPhone Duo는 접고 펼 때마다 창 크기가 바뀌므로 기기 종류로 루트를 고르지 않는다.
+        // split view가 좁은 화면에서는 한 칸(목록 → push)으로 접히고, 넓은 화면에서는 목록 | 상세 두 칸으로 펼쳐진다.
+        window?.rootViewController = MainSplitViewController(style: .doubleColumn)
         window?.makeKeyAndVisible()
     }
 
