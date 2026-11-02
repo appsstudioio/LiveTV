@@ -1,0 +1,109 @@
+# PR 자동 생성
+# 작업 브랜치를 push하면 대상 브랜치로 가는 PR이 없을 때 새로 만든다. 이미 열린 PR이 있으면 건너뛴다.
+#   feature/*  → develop  (라벨 enhancement)
+#   fix/*      → develop  (라벨 bug)
+#   hotfix/*   → main     (라벨 bug)
+#   develop    → main     (라벨 release, 릴리즈 PR)
+# 라벨은 릴리즈 노트 분류(.github/release.yml)에 쓰인다.
+#
+# 처음 한 번 저장소 설정이 필요하다:
+#   Settings → Actions → General → Workflow permissions
+#   → "Allow GitHub Actions to create and approve pull requests" 체크
+name: PR 자동 생성
+
+on:
+  push:
+    branches:
+      - 'feature/**'
+      - 'fix/**'
+      - 'hotfix/**'
+      - develop
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+concurrency:
+  group: auto-pr-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  create-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 코드 받기
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: PR 생성
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          HEAD_BRANCH: ${{ github.ref_name }}
+          HEAD_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+
+          case "$HEAD_BRANCH" in
+            develop)   BASE=main;    LABEL=release;     LABEL_COLOR=5319e7 ;;
+            feature/*) BASE=develop; LABEL=enhancement; LABEL_COLOR=a2eeef ;;
+            fix/*)     BASE=develop; LABEL=bug;         LABEL_COLOR=d73a4a ;;
+            hotfix/*)  BASE=main;    LABEL=bug;         LABEL_COLOR=d73a4a ;;
+            *) echo "대상 브랜치가 아닙니다: $HEAD_BRANCH"; exit 0 ;;
+          esac
+
+          OPEN_COUNT="$(gh pr list --head "$HEAD_BRANCH" --base "$BASE" --state open --json number --jq 'length')"
+          if [ "$OPEN_COUNT" != "0" ]; then
+            echo "$HEAD_BRANCH → $BASE PR이 이미 열려 있어 건너뜁니다."
+            exit 0
+          fi
+
+          git fetch --no-tags origin "$BASE"
+          COMMIT_COUNT="$(git rev-list --count --no-merges "origin/$BASE..$HEAD_SHA")"
+          if [ "$COMMIT_COUNT" = "0" ]; then
+            echo "$BASE 에 없는 커밋이 없어 PR을 만들지 않습니다."
+            exit 0
+          fi
+
+          # 릴리즈 노트 분류용 라벨이 없으면 만든다.
+          gh label create "$LABEL" --color "$LABEL_COLOR" --force >/dev/null
+
+          VERSION="$(sed -nE 's/^MARKETING_VERSION[[:space:]]*=[[:space:]]*([0-9.]+).*/\1/p' LiveTV/Configurations/xcconfig/Release.xcconfig | head -n 1)"
+          if [ "$HEAD_BRANCH" = "develop" ]; then
+            TITLE="릴리즈 ${VERSION}: develop → main"
+          else
+            # 브랜치의 첫 커밋 제목을 PR 제목으로 쓴다.
+            TITLE="$(git log --reverse --no-merges --format='%s' "origin/$BASE..$HEAD_SHA" | head -n 1)"
+            TITLE="${TITLE:-$HEAD_BRANCH}"
+          fi
+
+          {
+            echo "## 개요"
+            echo ""
+            echo "\`$HEAD_BRANCH\` → \`$BASE\` 자동 생성 PR입니다."
+            echo ""
+            echo "## 커밋 (${COMMIT_COUNT}개)"
+            echo ""
+            git log --no-merges --format='- %s (%h)' "origin/$BASE..$HEAD_SHA"
+            echo ""
+            echo "## 변경 파일"
+            echo ""
+            echo '```'
+            git diff --stat "origin/$BASE...$HEAD_SHA" | tail -n 30
+            echo '```'
+            echo ""
+            echo "## 확인"
+            echo ""
+            echo "- [ ] iPhone (일반) 동작 확인"
+            echo "- [ ] iPad 동작 확인"
+            echo "- [ ] iPhone Duo 접힘·펼침, 재생 중 전환 확인"
+            echo "- [ ] 프로젝트 지침(.kiro/steering/project-guidelines.md) 갱신 여부 확인"
+            if [ "$HEAD_BRANCH" = "develop" ]; then
+              echo "- [ ] 두 xcconfig의 MARKETING_VERSION(${VERSION}) 확인"
+              echo ""
+              echo "머지 후 \`${VERSION}\` 태그를 push하거나 Actions의 '릴리즈 노트 생성'을 실행하면 릴리즈 노트가 만들어집니다."
+            fi
+          } > pr_body.md
+
+          gh pr create --base "$BASE" --head "$HEAD_BRANCH" --title "$TITLE" --body-file pr_body.md --label "$LABEL"

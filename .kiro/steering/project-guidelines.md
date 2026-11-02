@@ -55,6 +55,17 @@ LiveTV/
     └── CommonViews/             # 재사용 뷰 (ToastView)
 ```
 
+저장소 루트에는 앱 소스 외에 다음이 있다.
+
+```
+README.md                        # 프로젝트 소개·빌드·브랜치/릴리즈 흐름. 기능·설정·흐름이 바뀌면 함께 고친다
+.github/
+├── release.yml                  # 자동 릴리즈 노트의 라벨별 분류
+└── workflows/
+    ├── auto-pr.yml              # 브랜치 push 시 PR 자동 생성 + 라벨 부여
+    └── release.yml              # 버전 태그 push(또는 직접 실행) 시 GitHub 릴리즈·노트 생성
+```
+
 ### 새 화면 추가 규칙
 
 `Views/<화면명>/` 아래에 필요한 하위 폴더만 만든다.
@@ -245,6 +256,13 @@ extension ChannelListViewController: UICollectionViewDelegate { … }
 5. 구조나 특징이 달라졌다면 이 문서를 수정한다(0장 1번).
 6. 빌드 확인이 필요하면 사용자의 Xcode 환경을 기준으로 안내한다. 예: `xcodebuild -project LiveTV.xcodeproj -scheme LiveTV-Dev -destination 'generic/platform=iOS Simulator' build`. 요청이 없으면 테스트 코드를 추가하지 않는다(현재 테스트 타깃 없음).
 7. 커밋 메시지는 기존 이력처럼 날짜와 작업 내용을 짧은 한국어로 적는다(예: `2024.10.25 ipad UI 추가.`). 사용자가 요청하기 전에는 커밋하지 않는다.
+8. 브랜치·PR·릴리즈는 GitHub Actions로 자동화되어 있다.
+   - 브랜치 이름이 PR 대상과 라벨을 정한다: `feature/*` → `develop`(`enhancement`), `fix/*` → `develop`(`bug`), `hotfix/*` → `main`(`bug`), `develop` → `main`(`release`). 새 작업 브랜치는 이 접두어를 쓴다.
+   - PR 제목은 브랜치의 첫 커밋 제목이 되므로 첫 커밋 메시지를 작업 내용이 드러나게 쓴다.
+   - 릴리즈 노트는 이전 버전 태그 이후 머지된 PR을 라벨별로 묶는다(`.github/release.yml`). `release` 라벨 PR은 제외된다.
+   - 버전 태그는 `MARKETING_VERSION`과 같은 `x.y.z` 형식이다(`v` 접두어 없음, 기존 태그 `1.0.0`, `1.0.1`). 직접 실행 시 버전을 비우면 `Release.xcconfig` 값을 쓴다.
+   - PR 자동 생성은 저장소 설정 "Allow GitHub Actions to create and approve pull requests"가 켜져 있어야 한다.
+   - 워크플로의 셸에는 브랜치 이름·커밋 메시지 같은 값을 `${{ }}`로 직접 넣지 않고 `env`로 넘긴다(스크립트 주입 방지).
 
 ## 8. 알려진 특이사항 (수정 요청이 없으면 그대로 둔다)
 
