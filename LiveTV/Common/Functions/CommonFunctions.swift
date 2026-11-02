@@ -66,16 +66,13 @@ class CommonFunctions {
            }
        }
    }
-
-    static var isIOS: Bool {
-        return (UIDevice.current.userInterfaceIdiom == .phone)
-    }
 }
 
 // MARK: - SDK Config & app setting
 extension CommonFunctions {
 
    static func kingfisherConfig() {
+#if canImport(Kingfisher)
        /* Kingfisher Image Cache config */
        // Limit memory cache size to 200 MB.(200 * 1024 * 1024)
        ImageCache.default.memoryStorage.config.totalCostLimit = 200 * 1024 * 1024
@@ -99,6 +96,7 @@ extension CommonFunctions {
                }
            }
        }
+#endif
    }
 
    static func progressHUDConfig() {

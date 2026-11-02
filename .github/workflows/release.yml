@@ -1,0 +1,88 @@
+# 릴리즈 노트 자동 작성
+# - 버전 태그(예: 1.0.6)를 push하면 그 태그로 GitHub 릴리즈를 만들고 노트를 자동으로 채운다.
+# - Actions 탭에서 직접 실행하면 Release.xcconfig의 MARKETING_VERSION(또는 입력한 버전)으로 태그와 릴리즈를 함께 만든다.
+# 노트 분류는 .github/release.yml을 따른다.
+name: 릴리즈 노트 생성
+
+on:
+  push:
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: '릴리즈 버전 (비우면 Release.xcconfig의 MARKETING_VERSION)'
+        required: false
+        type: string
+      target:
+        description: '태그를 만들 브랜치'
+        required: false
+        default: main
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 코드 받기
+        uses: actions/checkout@v4
+        with:
+          # 이전 태그를 찾아야 하므로 전체 이력과 태그를 받는다.
+          fetch-depth: 0
+          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.target || github.ref }}
+
+      - name: 버전 결정
+        id: version
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          REF_NAME: ${{ github.ref_name }}
+          INPUT_VERSION: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+          if [ "$EVENT_NAME" = "push" ]; then
+            TAG="$REF_NAME"
+          else
+            XCCONFIG_VERSION="$(sed -nE 's/^MARKETING_VERSION[[:space:]]*=[[:space:]]*([0-9.]+).*/\1/p' LiveTV/Configurations/xcconfig/Release.xcconfig | sed -n '1p')"
+            TAG="${INPUT_VERSION:-$XCCONFIG_VERSION}"
+          fi
+
+          if ! printf '%s' "$TAG" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "::error::버전 형식이 올바르지 않습니다: '$TAG' (예: 1.0.6)"
+            exit 1
+          fi
+
+          # 버전 순으로 정렬해 이번 태그 바로 앞의 태그를 찾는다. 노트는 그 태그 이후의 변경만 담는다.
+          PREVIOUS_TAG="$( { git tag --list | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' || true; echo "$TAG"; } \
+            | sort -uV | awk -v t="$TAG" '$0 == t { print p; exit } { p = $0 }')"
+
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "previous_tag=$PREVIOUS_TAG" >> "$GITHUB_OUTPUT"
+          echo "이번 태그: $TAG / 이전 태그: ${PREVIOUS_TAG:-없음}"
+
+      - name: 릴리즈 생성
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ steps.version.outputs.tag }}
+          PREVIOUS_TAG: ${{ steps.version.outputs.previous_tag }}
+        run: |
+          set -euo pipefail
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "릴리즈 $TAG 가 이미 있어 건너뜁니다."
+            exit 0
+          fi
+
+          ARGS=(--title "$TAG" --generate-notes --latest --target "$(git rev-parse HEAD)")
+          if [ -n "$PREVIOUS_TAG" ]; then
+            ARGS+=(--notes-start-tag "$PREVIOUS_TAG")
+          fi
+
+          # 태그가 없으면(직접 실행) gh가 target 커밋에 태그를 만든다.
+          gh release create "$TAG" "${ARGS[@]}"
+          echo "### 릴리즈 $TAG 생성 완료" >> "$GITHUB_STEP_SUMMARY"
