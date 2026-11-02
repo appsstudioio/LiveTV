@@ -49,7 +49,7 @@ jobs:
           if [ "$EVENT_NAME" = "push" ]; then
             TAG="$REF_NAME"
           else
-            XCCONFIG_VERSION="$(sed -nE 's/^MARKETING_VERSION[[:space:]]*=[[:space:]]*([0-9.]+).*/\1/p' LiveTV/Configurations/xcconfig/Release.xcconfig | head -n 1)"
+            XCCONFIG_VERSION="$(sed -nE 's/^MARKETING_VERSION[[:space:]]*=[[:space:]]*([0-9.]+).*/\1/p' LiveTV/Configurations/xcconfig/Release.xcconfig | sed -n '1p')"
             TAG="${INPUT_VERSION:-$XCCONFIG_VERSION}"
           fi
 

@@ -69,12 +69,14 @@ jobs:
           # 릴리즈 노트 분류용 라벨이 없으면 만든다.
           gh label create "$LABEL" --color "$LABEL_COLOR" --force >/dev/null
 
-          VERSION="$(sed -nE 's/^MARKETING_VERSION[[:space:]]*=[[:space:]]*([0-9.]+).*/\1/p' LiveTV/Configurations/xcconfig/Release.xcconfig | head -n 1)"
+          VERSION="$(sed -nE 's/^MARKETING_VERSION[[:space:]]*=[[:space:]]*([0-9.]+).*/\1/p' LiveTV/Configurations/xcconfig/Release.xcconfig | sed -n '1p')"
           if [ "$HEAD_BRANCH" = "develop" ]; then
             TITLE="릴리즈 ${VERSION}: develop → main"
           else
             # 브랜치의 첫 커밋 제목을 PR 제목으로 쓴다.
-            TITLE="$(git log --reverse --no-merges --format='%s' "origin/$BASE..$HEAD_SHA" | head -n 1)"
+            # head -n 1은 첫 줄만 읽고 끝나서 앞의 git log가 SIGPIPE(종료 코드 141)로 죽고, pipefail 때문에 단계가 실패한다.
+            # sed -n 1p는 입력을 끝까지 읽으므로 안전하다.
+            TITLE="$(git log --reverse --no-merges --format='%s' "origin/$BASE..$HEAD_SHA" | sed -n '1p')"
             TITLE="${TITLE:-$HEAD_BRANCH}"
           fi
 
