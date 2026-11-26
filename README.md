@@ -97,7 +97,7 @@ LiveTV/
 ## 브랜치와 배포 흐름
 
 ```
-feature/* ──PR──▶ develop ──PR──▶ main ──태그(1.0.6)──▶ GitHub 릴리즈
+feature/* ──PR──▶ develop ──PR──▶ main ──태그(1.1.0)──▶ GitHub 릴리즈
 fix/*     ──PR──▶ develop
 hotfix/*  ──PR──▶ main
 ```
@@ -106,24 +106,40 @@ GitHub Actions가 다음을 자동으로 합니다.
 
 | 워크플로 | 실행 시점 | 하는 일 |
 | --- | --- | --- |
-| [PR 자동 생성](.github/workflows/auto-pr.yml) | `feature/*`, `fix/*`, `hotfix/*`, `develop` push | 대상 브랜치로 PR을 만들고 라벨을 붙입니다. 열린 PR이 있으면 건너뜁니다. |
-| [릴리즈 노트 생성](.github/workflows/release.yml) | 버전 태그 push, 또는 Actions에서 직접 실행 | GitHub 릴리즈를 만들고 이전 태그 이후 머지된 PR로 노트를 채웁니다. |
+| [PR 자동 생성](.github/workflows/auto-pr.yml) | `feature/*`, `fix/*`, `hotfix/*`, `develop` push | 대상 브랜치로 PR을 만듭니다. 열린 PR이 있으면 건너뜁니다. |
+| [릴리즈 노트 생성](.github/workflows/release.yml) | 버전 태그 push, 또는 Actions에서 직접 실행 | [CHANGELOG.md](CHANGELOG.md)에서 같은 버전의 섹션을 찾아 GitHub 릴리즈 노트로 씁니다. |
 
-릴리즈 노트는 PR 라벨로 묶입니다([`.github/release.yml`](.github/release.yml)).
+### 변경 내역(CHANGELOG.md) 쓰는 법
 
-| 라벨 | 노트 분류 | 붙는 브랜치 |
-| --- | --- | --- |
-| `enhancement` | 새 기능 | `feature/*` |
-| `bug` | 버그 수정 | `fix/*`, `hotfix/*` |
-| `documentation` | 문서 | 직접 지정 |
-| `release` | 노트에서 제외 | `develop` → `main` |
+릴리즈 노트는 [CHANGELOG.md](CHANGELOG.md)가 기준입니다. 사람이 읽을 문장으로 직접 씁니다.
+
+```markdown
+## [1.1.0] - 2026-11-02
+
+### 새 기능
+- 무엇이 새로 생겼는지
+
+### 변경
+- 무엇이 달라졌는지
+
+### 버그 수정
+- 무엇이 고쳐졌는지
+
+### 기타
+- 개발·문서 등 사용자에게 보이지 않는 변경
+```
+
+- 작업하는 동안에는 맨 위 `## [Unreleased]` 아래에 적습니다.
+- 릴리즈할 때 `## [Unreleased]` 내용을 `## [버전] - 날짜` 섹션으로 옮깁니다. 제목의 버전은 태그와 같은 `x.y.z` 형식(`v` 없음)입니다.
+- 해당 버전 섹션이 없거나 비어 있으면 릴리즈 워크플로가 실패합니다.
 
 ### 릴리즈 하는 법
 
 1. `Develop.xcconfig`, `Release.xcconfig`의 `MARKETING_VERSION`을 함께 올립니다.
-2. `develop`을 push하면 `main`으로 가는 릴리즈 PR이 생깁니다. 확인 후 머지합니다.
-3. 아래 둘 중 하나로 릴리즈를 만듭니다.
-   - 태그 push: `git tag 1.0.6 && git push origin 1.0.6`
+2. [CHANGELOG.md](CHANGELOG.md)에 새 버전 섹션을 씁니다.
+3. `develop`을 올리면 `main`으로 가는 릴리즈 PR이 생깁니다. 확인 후 머지합니다.
+4. 아래 둘 중 하나로 릴리즈를 만듭니다.
+   - 버전 태그를 만들어 올리기: `git tag 1.1.0` 다음 `git push origin 1.1.0`
    - Actions → **릴리즈 노트 생성** → Run workflow (버전을 비우면 `Release.xcconfig` 값 사용)
 
 ### 처음 한 번 설정
