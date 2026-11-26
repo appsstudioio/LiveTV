@@ -4,7 +4,7 @@
 #   fix/*      → develop  (라벨 bug)
 #   hotfix/*   → main     (라벨 bug)
 #   develop    → main     (라벨 release, 릴리즈 PR)
-# 라벨은 릴리즈 노트 분류(.github/release.yml)에 쓰인다.
+# 라벨은 PR을 구분하는 용도다. 릴리즈 노트는 라벨이 아니라 CHANGELOG.md에서 만든다(release.yml).
 #
 # 처음 한 번 저장소 설정이 필요하다:
 #   Settings → Actions → General → Workflow permissions
@@ -103,8 +103,15 @@ jobs:
             echo "- [ ] 프로젝트 지침(.kiro/steering/project-guidelines.md) 갱신 여부 확인"
             if [ "$HEAD_BRANCH" = "develop" ]; then
               echo "- [ ] 두 xcconfig의 MARKETING_VERSION(${VERSION}) 확인"
+              if grep -q "^## \[${VERSION}\]" CHANGELOG.md 2>/dev/null; then
+                echo "- [x] CHANGELOG.md에 ${VERSION} 섹션 있음"
+              else
+                echo "- [ ] **CHANGELOG.md에 \`## [${VERSION}]\` 섹션이 없습니다.** 릴리즈 전에 작성하세요."
+              fi
               echo ""
-              echo "머지 후 \`${VERSION}\` 태그를 push하거나 Actions의 '릴리즈 노트 생성'을 실행하면 릴리즈 노트가 만들어집니다."
+              echo "머지 후 \`${VERSION}\` 태그를 올리거나 Actions의 '릴리즈 노트 생성'을 실행하면 CHANGELOG.md의 ${VERSION} 섹션으로 릴리즈 노트가 만들어집니다."
+            else
+              echo "- [ ] 사용자에게 보이는 변경이면 CHANGELOG.md의 \`[Unreleased]\`에 추가"
             fi
           } > pr_body.md
 

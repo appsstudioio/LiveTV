@@ -59,11 +59,10 @@ LiveTV/
 
 ```
 README.md                        # 프로젝트 소개·빌드·브랜치/릴리즈 흐름. 기능·설정·흐름이 바뀌면 함께 고친다
-.github/
-├── release.yml                  # 자동 릴리즈 노트의 라벨별 분류
-└── workflows/
-    ├── auto-pr.yml              # 브랜치 push 시 PR 자동 생성 + 라벨 부여
-    └── release.yml              # 버전 태그 push(또는 직접 실행) 시 GitHub 릴리즈·노트 생성
+CHANGELOG.md                     # 버전별 변경 내역(새 기능·변경·버그 수정·기타). GitHub 릴리즈 노트의 원본
+.github/workflows/
+├── auto-pr.yml                  # 브랜치 push 시 PR 자동 생성 + 라벨 부여
+└── release.yml                  # 버전 태그 push(또는 직접 실행) 시 CHANGELOG.md의 해당 버전 섹션으로 GitHub 릴리즈 생성
 ```
 
 ### 새 화면 추가 규칙
@@ -259,7 +258,8 @@ extension ChannelListViewController: UICollectionViewDelegate { … }
 8. 브랜치·PR·릴리즈는 GitHub Actions로 자동화되어 있다.
    - 브랜치 이름이 PR 대상과 라벨을 정한다: `feature/*` → `develop`(`enhancement`), `fix/*` → `develop`(`bug`), `hotfix/*` → `main`(`bug`), `develop` → `main`(`release`). 새 작업 브랜치는 이 접두어를 쓴다.
    - PR 제목은 브랜치의 첫 커밋 제목이 되므로 첫 커밋 메시지를 작업 내용이 드러나게 쓴다.
-   - 릴리즈 노트는 이전 버전 태그 이후 머지된 PR을 라벨별로 묶는다(`.github/release.yml`). `release` 라벨 PR은 제외된다.
+   - 릴리즈 노트의 원본은 `CHANGELOG.md`다. 사용자에게 보이는 변경(기능 추가, 동작 변경, 버그 수정)을 한 PR에 담을 때 `## [Unreleased]` 아래 `### 새 기능` / `### 변경` / `### 버그 수정` / `### 기타` 중 맞는 곳에 한국어 한 줄로 추가한다. 릴리즈할 때 `[Unreleased]` 내용을 `## [x.y.z] - YYYY-MM-DD` 섹션으로 옮긴다.
+   - 릴리즈 워크플로는 태그와 같은 `[x.y.z]` 섹션을 `CHANGELOG.md`에서 꺼내 노트로 쓴다. 섹션이 없거나 비어 있으면 실패하므로, 버전을 올리면(`MARKETING_VERSION`) 같은 작업에서 `CHANGELOG.md`도 함께 쓴다.
    - 버전 태그는 `MARKETING_VERSION`과 같은 `x.y.z` 형식이다(`v` 접두어 없음, 기존 태그 `1.0.0`, `1.0.1`). 직접 실행 시 버전을 비우면 `Release.xcconfig` 값을 쓴다.
    - PR 자동 생성은 저장소 설정 "Allow GitHub Actions to create and approve pull requests"가 켜져 있어야 한다.
    - 워크플로의 셸에는 브랜치 이름·커밋 메시지 같은 값을 `${{ }}`로 직접 넣지 않고 `env`로 넘긴다(스크립트 주입 방지).
